@@ -30,6 +30,20 @@ public class MovementOnTheMouseManager : MonoBehaviour
 
     void Update()
     {
+
+        if(PrephabToMove != null)
+        {
+            
+            if(GameManager.Instance.TurnPlayer1 == GameManager.Instance.TurnPlayer1)
+            {
+                
+            }
+            else
+            {
+                
+            }
+
+        }
 #if UNITY_ANDROID
         if (Input.touchCount > 0)
         {
@@ -349,13 +363,17 @@ public class MovementOnTheMouseManager : MonoBehaviour
 
     public void NewPrephabToMovement()
     {
+        
         Destroy(PrephabToMove);
+
+        SpriteRenderer spriteRenderer = PrephabToMove.GetComponent<SpriteRenderer>();
 
             if (Player1Move)
             {
                 PrephabToMove = Instantiate(player1, new Vector3(0, 8.5f, 0), Quaternion.identity);
                 Rigidbody2D rb2d = PrephabToMove.GetComponent<Rigidbody2D>();
                 BoxCollider2D boxCollider2D = PrephabToMove.GetComponent<BoxCollider2D>();
+                spriteRenderer.sprite = GameObject.Find("Player1").GetComponent<SpriteRenderer>().sprite;
                 boxCollider2D.isTrigger = true;
                 Destroy(rb2d);
             }
@@ -364,6 +382,7 @@ public class MovementOnTheMouseManager : MonoBehaviour
                 PrephabToMove = Instantiate(player2, new Vector3(0, 8.5f, 0), Quaternion.identity);
                 Rigidbody2D rb2d = PrephabToMove.GetComponent<Rigidbody2D>();
                 BoxCollider2D boxCollider2D = PrephabToMove.GetComponent<BoxCollider2D>();
+                spriteRenderer.sprite = GameObject.Find("Player2").GetComponent<SpriteRenderer>().sprite;
                 boxCollider2D.isTrigger = true;
                 Destroy(rb2d);
             }

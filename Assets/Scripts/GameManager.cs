@@ -121,14 +121,13 @@ public class GameManager : MonoBehaviour
         Instance = this;
         effectManager = GetComponent<EffectManager>();
         StartGame();
-#if !UNITY_ANDROID
+
         foreach (CanvasGroup canvasGroup in canvasGroupsForPhone)
         {
             canvasGroup.alpha = 0;
             canvasGroup.interactable = false;
             canvasGroup.blocksRaycasts = false;
         }
-#endif
     }
     private void Update()
     {
@@ -930,6 +929,14 @@ public class GameManager : MonoBehaviour
         if (Player1Ready && Player2Ready)
         {
             LoadGame();
+#if UNITY_ANDROID
+        foreach (CanvasGroup canvasGroup in canvasGroupsForPhone)
+        {
+            canvasGroup.alpha = 1;
+            canvasGroup.interactable = true;
+            canvasGroup.blocksRaycasts = true;
+        }
+#endif
         }
     }
 
