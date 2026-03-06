@@ -105,7 +105,6 @@ public class EnemyAI : MonoBehaviour
         {
             case EnemyType.Cactus:
                 stunsEnemy = 2;
-                Debug.Log("ААААА");
                 GameManager.Instance.StunAllEditings(2, PlayerTarget);
                 break;
         }
@@ -114,7 +113,7 @@ public class EnemyAI : MonoBehaviour
     private void TakeDamage(int damage)
     {
         health -= damage;
-        if(health == 0)
+        if(health <= 0)
         {
             Destroy(this.gameObject);
         }
@@ -139,6 +138,11 @@ public class EnemyAI : MonoBehaviour
         {
             currentTween.Kill();
         }
+    }
+
+    public void DestroyThisEnemy()
+    {
+        Destroy(gameObject);
     }
 }
 

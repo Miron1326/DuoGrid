@@ -1889,13 +1889,13 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'ChronoGreed
+  m_Text: 'DuoGrid
 
-    version 1.6
+    version 1.697
 
     by Youtube
 
-    ChronoGreed
+    DuoGrid
 
 '
 --- !u!222 &893304938
@@ -2778,6 +2778,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba65071289d08a141bc32a9d50d19fde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
+  CellsPlayer1: 0
+  CellsPlayer2: 0
+  inventoryCellTypePlayer1: 
+  inventoryCellTypePlayer2: 
+  canvasGroupsForPhone: []
+  canvasGroupsForInventoryPlayer1: []
+  canvasGroupsForInventoryPlayer2: []
+  Player1Ready: 0
+  Player2Ready: 0
   PlayerLocked: 
   Player1StunEditing: 0
   Player2StunEditing: 0
@@ -2845,6 +2854,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f98de2f02fa39445b304c391f34e0ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DisastersManager
+  CellCreatingInThisTurn: 0
   CellTypesCantChange: 
   disastersTipes: 
   cellTypesAct: []

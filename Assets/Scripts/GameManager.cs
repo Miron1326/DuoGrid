@@ -151,7 +151,7 @@ public class GameManager : MonoBehaviour
             ToggleFullscreen();
         }
 
-        allGameObjects = GameObject.FindObjectsOfType<GameObject>();
+        allGameObjects = FindObjectsByType<GameObject>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
         if (!_canCheck) return;
         StartCoroutine(Timer1SecondToWallChecks());
         _canCheck = false;
@@ -165,50 +165,56 @@ public class GameManager : MonoBehaviour
 
     private void StartGame()
     {
-        cellInventoryPl1 = GameObject.Find("InventoryPlayer1").transform.Find("CellContainer").GetComponent<CellInventory>();
-        cellInventoryPl2 = GameObject.Find("InventoryPlayer2").transform.Find("CellContainer").GetComponent<CellInventory>();
-        TimeToBoom = 5;
-        TimeRemained = 5;
-        textForTimer = GameObject.Find("TextTimerCanvas").GetComponent<Text>();
-        canvasTimer = GameObject.Find("TimerCanvas").GetComponent<Canvas>();
-        canvasTimer.enabled = false;
+        string currentSceneName = SceneManager.GetActiveScene().name;
+        if (currentSceneName == "SampleScene")
+        {
+            cellInventoryPl1 = GameObject.Find("InventoryPlayer1").transform.Find("CellContainer").GetComponent<CellInventory>();
+            cellInventoryPl2 = GameObject.Find("InventoryPlayer2").transform.Find("CellContainer").GetComponent<CellInventory>();
+        }
+            TimeToBoom = 5;
+            TimeRemained = 5;
+            textForTimer = GameObject.Find("TextTimerCanvas").GetComponent<Text>();
+            canvasTimer = GameObject.Find("TimerCanvas").GetComponent<Canvas>();
+            canvasTimer.enabled = false;
 
-        ItemStatsPlayer1.Clear();
-        ItemStatsPlayer2.Clear();
-        ItemStatsPlayer1.Add("GuavaBoom", 3);
-        ItemStatsPlayer2.Add("GuavaBoom", 3);
-        int randomMedkitPl1 = UnityEngine.Random.Range(0, 4);
-        int randomMedkitPl2 = UnityEngine.Random.Range(0, 4);
-        ItemStatsPlayer1.Add("Medkit", randomMedkitPl1);
-        ItemStatsPlayer2.Add("Medkit", randomMedkitPl2);
-        StartGameBoolPlayer1 = true;
-        StartGameBoolPlayer2 = true;
-        CanvasGroup canvasGroup1 = GameObject.Find("Player1OfWin").GetComponent<CanvasGroup>();
-        CanvasGroup canvasGroup2 = GameObject.Find("Player2OfWin").GetComponent<CanvasGroup>();
-        canvasGroup1.alpha = 0f;
-        canvasGroup1.interactable = false;
-        canvasGroup1.blocksRaycasts = false;
-        canvasGroup2.alpha = 0f;
-        canvasGroup2.interactable = false;
-        canvasGroup2.blocksRaycasts = false;
-        player1PoisonHave = 3;
-        player2PoisonHave = 3;
-         
-        player1IsPoisoned = false;
-        player2IsPoisoned = false;
-        _player1GameObject = GameObject.Find("Player1");
-        _player2GameObject = GameObject.Find("Player2");
-        _startPositionPlayer1 = new Vector3(17.3f,0,0);
-        _startPositionPlayer2 = new Vector3(-17.3f, 0, 0);
-        player1Tacts = 0;
-        player2Tacts = 0;
-        player1Health = 3;
-        player2Health = 3;
-        player1Wins = 0;
-        player2Wins = 0;
-        Player1CanPlaceFinish = true;
-        Player2CanPlaceFinish = true;
-        PlayerUIEn("");
+            ItemStatsPlayer1.Clear();
+            ItemStatsPlayer2.Clear();
+            ItemStatsPlayer1.Add("GuavaBoom", 3);
+            ItemStatsPlayer2.Add("GuavaBoom", 3);
+            int randomMedkitPl1 = UnityEngine.Random.Range(0, 4);
+            int randomMedkitPl2 = UnityEngine.Random.Range(0, 4);
+            ItemStatsPlayer1.Add("Medkit", randomMedkitPl1);
+            ItemStatsPlayer2.Add("Medkit", randomMedkitPl2);
+            StartGameBoolPlayer1 = true;
+            StartGameBoolPlayer2 = true;
+            CanvasGroup canvasGroup1 = GameObject.Find("Player1OfWin").GetComponent<CanvasGroup>();
+            CanvasGroup canvasGroup2 = GameObject.Find("Player2OfWin").GetComponent<CanvasGroup>();
+            canvasGroup1.alpha = 0f;
+            canvasGroup1.interactable = false;
+            canvasGroup1.blocksRaycasts = false;
+            canvasGroup2.alpha = 0f;
+            canvasGroup2.interactable = false;
+            canvasGroup2.blocksRaycasts = false;
+            player1PoisonHave = 3;
+            player2PoisonHave = 3;
+
+            player1IsPoisoned = false;
+            player2IsPoisoned = false;
+            _player1GameObject = GameObject.Find("Player1");
+            _player2GameObject = GameObject.Find("Player2");
+            _startPositionPlayer1 = new Vector3(17.3f, 0, 0);
+            _startPositionPlayer2 = new Vector3(-17.3f, 0, 0);
+            player1Tacts = 0;
+            player2Tacts = 0;
+            player1Health = 3;
+            player2Health = 3;
+            player1Wins = 0;
+            player2Wins = 0;
+            Player1CanPlaceFinish = true;
+            Player2CanPlaceFinish = true;
+            PlayerUIEn("");
+        
+        
     }
 
     public void TimerStart(GameObject gameObjectCellTimer)
@@ -651,6 +657,7 @@ public class GameManager : MonoBehaviour
     {
         DisastersManager disastersManager = GetComponent<DisastersManager>();
         disastersManager.DeleteAllEnemy();
+        DestroyAllEnemy();
         Debug.Log("dfsdfdfdsfdsfdsds");
         TurnPlayer1 = 0;
         TurnPlayer2 = 0;
@@ -683,6 +690,7 @@ public class GameManager : MonoBehaviour
         }
         StartGame();
         PlayerController playerController = GetComponent<PlayerController>();
+        playerController.RestartMovements();
         playerController.RestartInitialize();
         MainMenu mainMenu = GetComponent<MainMenu>();
         mainMenu.CloseMenu();
@@ -900,6 +908,14 @@ public class GameManager : MonoBehaviour
         if (Player1Ready && Player2Ready)
         {
             LoadGame();
+#if UNITY_ANDROID
+            foreach (CanvasGroup canvasGroup in canvasGroupsForPhone)
+            {
+                canvasGroup.alpha = 1;
+                canvasGroup.interactable = true;
+                canvasGroup.blocksRaycasts = true;
+            }
+#endif
         }
 
     }
@@ -942,6 +958,8 @@ public class GameManager : MonoBehaviour
 
     public void LoadGame()
     {
+        MovementOnTheMouseManager movementOnTheMouseManager = GetComponent<MovementOnTheMouseManager>();
+        movementOnTheMouseManager.allSelected = true;
             if(inventoryCellTypePlayer1.Contains(EffectType.Finish) && inventoryCellTypePlayer2.Contains(EffectType.Finish))
             {
                 UpdateGameInventory();
@@ -1001,10 +1019,19 @@ public class GameManager : MonoBehaviour
 
     public void CancelChangingInAllButtonAndroid()
     {
-        CellInShop[] buttons = FindObjectsOfType<CellInShop>();
+        CellInShop[] buttons = FindObjectsByType<CellInShop>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
         foreach (var cellInShop in buttons)
         {
             cellInShop.CancelEditing();
+        }
+    }
+
+    public void DestroyAllEnemy()
+    {
+        EnemyAI[] enemies = FindObjectsByType<EnemyAI>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+        foreach(EnemyAI enemy in enemies)
+        {
+            enemy.DestroyThisEnemy();
         }
     }
 }

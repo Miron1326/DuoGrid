@@ -256,22 +256,25 @@ public class CellInShop : MonoBehaviour
                 }
                 
             }
-            if (CurrentCellType == EffectType.Finish) //нельзя ставить на грибы
+            if (CurrentCellType == EffectType.Finish)
             {
-                
-                if (!GameManager.Instance.bannedTypesToReplace.Contains(EffectType.NoneWithNoneEffectedMushrooms))
-                {
-                    GameManager.Instance.bannedTypesToReplace.Add(EffectType.NoneWithNoneEffectedMushrooms);
-                }
+                    if (!GameManager.Instance.bannedTypesToReplace.Contains(EffectType.NoneWithNoneEffectedMushrooms))
+                    {
+                        GameManager.Instance.bannedTypesToReplace.Add(EffectType.NoneWithNoneEffectedMushrooms);
+                    }
             }
             else
             {
-                if (!GameManager.Instance.bannedTypesToReplace.Contains(EffectType.NoneWithNoneEffectedMushrooms))
+                Debug.Log("dsfsdfsdf");
+                if (GameManager.Instance.bannedTypesToReplace.Contains(EffectType.NoneWithNoneEffectedMushrooms))
                 {
                     GameManager.Instance.bannedTypesToReplace.Remove(EffectType.NoneWithNoneEffectedMushrooms);
                 }
-
             }
+
+            
+
+            
             MovementOnTheMouseManager movementOnTheMouseManager = GameObject.Find("GameManager").GetComponent<MovementOnTheMouseManager>();
             movementOnTheMouseManager.playerCanMoveByMouse = false;
 

@@ -531,4 +531,10 @@ public class PlayerController : MonoBehaviour
         }
         StartCoroutine(EnableSnapAfterDelay(originalSnapState, 0.1f));
     }
+
+    public void RestartMovements()
+    {
+        P1Move = true;
+        P2Move = false;
+    }
 }

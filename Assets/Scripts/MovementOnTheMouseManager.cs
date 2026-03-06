@@ -19,6 +19,7 @@ public class MovementOnTheMouseManager : MonoBehaviour
     private Vector3 originalPositionPlayer1;
     private Vector3 originalPositionPlayer2;
     public bool CanPutHere;
+    public bool allSelected = false;
     public HashSet<GameObject> detectedObjects = new HashSet<GameObject>(); //список без повторяемых данных
     void Start()
     {
@@ -30,7 +31,7 @@ public class MovementOnTheMouseManager : MonoBehaviour
 
     void Update()
     {
-
+        if (!allSelected) return;
         if(PrephabToMove != null)
         {
             
@@ -363,7 +364,7 @@ public class MovementOnTheMouseManager : MonoBehaviour
 
     public void NewPrephabToMovement()
     {
-        
+        if (!allSelected) return;
         Destroy(PrephabToMove);
 
         SpriteRenderer spriteRenderer = PrephabToMove.GetComponent<SpriteRenderer>();
