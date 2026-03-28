@@ -11,7 +11,7 @@ public class CharacterButton : MonoBehaviour
         {
             characterManager.CharacterDataPlayer1 = currentCharacterData;
         }
-        else
+        if(playerButton == "player2")
         {
             characterManager.CharacterDataPlayer2 = currentCharacterData;
         }

@@ -3,11 +3,13 @@ using UnityEngine.UI;
 
 public class CellEditor : MonoBehaviour
 {
+
     public bool ThisPlayerStunned;
     public bool Player1Blocked;
     public bool Player2Blocked;
     private bool Pl1;
     private GameObject AllButtonShop;
+    private MovementOnTheMouseManager movementOnTheMouseManager;
     private Vector2 StartPosition = new Vector2(0, 200);
     private Vector2 NewPosition = new Vector2(0, -100);
     public bool ShowPanel = false;
@@ -15,6 +17,7 @@ public class CellEditor : MonoBehaviour
     private int Push;
     private void Start()
     {
+        movementOnTheMouseManager = GetComponent<MovementOnTheMouseManager>();
         AllButtonShop = GameObject.Find("Panel_CellEditor");
         GameObject Panel = GameObject.Find("Panel_CellEditor");
         RectTransform rectTransform = Panel.GetComponent<RectTransform>();
@@ -70,7 +73,7 @@ public class CellEditor : MonoBehaviour
 
 
 
-        if (Input.GetKeyDown(KeyCode.C) || Input.GetMouseButtonDown(1))
+        if (Input.GetKeyDown(KeyCode.C) || Input.GetMouseButtonDown(1) && movementOnTheMouseManager.allSelected)
         {
             if (ThisPlayerStunned) return;
             Cursor.visible = true;

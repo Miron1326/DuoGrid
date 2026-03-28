@@ -6,6 +6,9 @@ using UnityEngine.UI;
 
 public class CellType : MonoBehaviour
 {
+    public CellEffectFromSacrifice cellEffectFromSacrifice;
+    public CellClass currentClass;
+    public bool ActiveCell;
     public int TurnsHave;
     public StilisticType CurrentStilisticType;
     public int Activates;
@@ -172,6 +175,9 @@ public class CellType : MonoBehaviour
                         
 
                         break;
+
+                    case EffectType.Sacrifice: SpriteRenderer.color = normalColor; SpriteRenderer.sprite = Resources.Load<Sprite>("sprites/CellsType/sacrificeCell"); break;
+                    case EffectType.BloodMoonPortal: SpriteRenderer.color = normalColor; SpriteRenderer.sprite = Resources.Load<Sprite>("sprites/CellsType/bloodPortalCell"); break;
                 }
                 break;
 
@@ -263,6 +269,7 @@ public class CellType : MonoBehaviour
         {
             case EffectType.FireCell:
             case EffectType.Damage:
+                if (!ActiveCell) return;
                 GameManager.Instance.TakeDamage(player.name, _damage);
                 break;
 
@@ -320,16 +327,22 @@ public class CellType : MonoBehaviour
                 break;
 
             case EffectType.MushroomMines:
+                if (!ActiveCell) return;
+                Debug.Log(1);
                 Debug.Log(player.name + " получил урон");
                 GameManager.Instance.TakeDamage("Explosure " + player.name, DamageForExpl);
+                Debug.Log(2);
                 EffectManager effectManager = GameObject.Find("GameManager").GetComponent<EffectManager>();
+                Debug.Log(3);
                 effectManager.PlayerExplosion(player.transform.position);
                 GameManager.Instance.PlayerStun(player.name, 1);
+                Debug.Log(4);
                 currentType = EffectType.None;
                 UpdateVisual();
                 break;
 
             case EffectType.Medkit:
+                if (!ActiveCell) return;
                 Debug.Log(player.name + " использовал аптечку");
                 if(animatorForThisCell == null){
                     animatorForThisCell = gameObject.AddComponent<Animator>();
@@ -361,7 +374,14 @@ public class CellType : MonoBehaviour
 
                 break;
 
-
+            case EffectType.Sacrifice:
+                if (!ActiveCell) return;
+                GameManager.Instance.TakeDamage(player.name, _damage);
+                cellEffectFromSacrifice.AfterNeededAction(player.name);
+                ChangeType(EffectType.None);
+                BloodMagesticManager bloodMagesticManager = GameObject.Find("BloodManager").GetComponent<BloodMagesticManager>();
+                bloodMagesticManager.ChanceforMage += 100;
+                break;
         }
     }
 
@@ -389,6 +409,31 @@ public class CellType : MonoBehaviour
 
     public void ChangeType(EffectType newtype)
     {
+        if (GameManager.Instance.cactusLikeCell.Contains(newtype))
+        {
+            currentClass = CellClass.cactusLike;
+        }
+        else
+        {
+            currentClass = CellClass.None;
+        }
+        if (GameManager.Instance.NewCellsWithMoreFunctional.Contains(newtype))
+        {
+            if(gameObject.GetComponent<CellEffectFromSacrifice>() == false)
+            {
+                cellEffectFromSacrifice = gameObject.AddComponent<CellEffectFromSacrifice>();
+                cellEffectFromSacrifice.effectType = newtype;
+            }
+
+        }
+        else
+        {
+            if (gameObject.GetComponent<CellEffectFromSacrifice>() == true)
+            {
+                Destroy(gameObject.GetComponent<CellAddToInventory>());
+            }
+        }
+        ActiveCell = true;
         GameManager.Instance.OnSwitchTurn -= TurnUp;
         GameManager.Instance.OnSwitchTurn += TurnUp;
         TurnsHave = 0;
@@ -455,12 +500,16 @@ public enum EffectType
     GuavaBoom,
     FireCell,
     Capsule,
-    Medkit
+    Medkit,
+    Sacrifice,
+    BloodMoonPortal,
+    BloodCell
 }
 public enum Modificator
 {
     Standart,
-    InCapsule
+    InCapsule,
+    InVarTechnichion
 }
 
 public enum Variate
@@ -469,4 +518,10 @@ public enum Variate
     EnemyCell,
     Enemy,
     Item
+}
+
+public enum CellClass
+{
+    cactusLike,
+    None
 }

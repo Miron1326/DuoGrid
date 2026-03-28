@@ -6,6 +6,8 @@ using UnityEngine.Rendering;
 
 public class CellEnemyType : MonoBehaviour
 {
+    public int level;
+    public Collider2D[] colliders;
     public EnemyTypeCell currentType;
     public Vector2 VectorAttack;
     public int Health;
@@ -49,10 +51,15 @@ public class CellEnemyType : MonoBehaviour
         switch (currentType)
         {
             case EnemyTypeCell.Tentacle:
-                Collider2D[] colliders = Physics2D.OverlapBoxAll(transform.position,VectorAttack, 0);
+                colliders = Physics2D.OverlapBoxAll(transform.position,VectorAttack, 0);
 
                 foreach (Collider2D collider in colliders)
                 {
+                    bool hasAbility = collider.GetComponent<AbilityItem>() != null;
+                    if (hasAbility)
+                    {
+                        Destroy(collider.gameObject);
+                    }
                     if (collider.gameObject == gameObject) continue;
 
                     GameObject obj = collider.gameObject;
@@ -106,6 +113,25 @@ public class CellEnemyType : MonoBehaviour
     public void OnDrawGizmos()
     {
         Gizmos.DrawWireCube(transform.position, VectorAttack);
+    }
+
+    public void ChangeLevel(int level, string Activator)
+    {
+        this.level += level;
+        GameObject newEnemy = Instantiate(GameObject.Find("EnemyPrephab"), transform.position, Quaternion.identity);
+        EnemyAI enemyAI = newEnemy.AddComponent<EnemyAI>();
+        enemyAI.currentType = EnemyType.Cactus;
+        enemyAI.StartInitialize();
+        if (Activator == "Player1")
+        {
+            enemyAI.SetPlayerTarget("Player2");
+        }
+        if (Activator == "Player2")
+        {
+            enemyAI.SetPlayerTarget("Player1");
+        }
+        DestroyEnemy();
+        
     }
 }
 public enum EnemyTypeCell

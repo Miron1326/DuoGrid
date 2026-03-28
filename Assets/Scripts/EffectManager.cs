@@ -5,11 +5,13 @@ public class EffectManager : MonoBehaviour
     private ParticleSystem _damage1;
     private ParticleSystem _damage2;
     private ParticleSystem _explosion;
+    private ParticleSystem _bloodRain;
     private void Start()
     {
         _damage1 = GameObject.Find("PlayerOneDamageCount").GetComponent<ParticleSystem>();
         _damage2 = GameObject.Find("PlayerTwoDamageCount").GetComponent<ParticleSystem>();
         _explosion = GameObject.Find("ExplosionEffect").GetComponent<ParticleSystem>();
+        _bloodRain = GameObject.Find("BloodRain").GetComponent<ParticleSystem>();
     }
     public void Player1Damaged(Vector3 PositionEffect)
     {
@@ -25,5 +27,14 @@ public class EffectManager : MonoBehaviour
     {
         _explosion.gameObject.transform.position = PositionEffect;
         _explosion.Play();
+    }
+    public void StartBloodRain()
+    {
+        _bloodRain.Play();
+    }
+
+    public void StopBloodRain()
+    {
+        _bloodRain.Stop();
     }
 }

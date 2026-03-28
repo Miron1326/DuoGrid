@@ -4,11 +4,13 @@ using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class CellInShop : MonoBehaviour
 {
+    
     public StilisticType CurrentStilisticType;
     public string Name;
     public EffectType CurrentCellType;
@@ -26,16 +28,36 @@ public class CellInShop : MonoBehaviour
     private Color AntidoteColor = Color.springGreen;
     private List<EffectType> bannedTypesToReplace = new List<EffectType>();
     private List<EffectType> allowedTypesInYourSt = new List<EffectType>();
+    private CanvasGroup currentCanvasGroup;
+    [SerializeField] private string HisPlayer;
 
     private void Start()
     {
         CurrentStilisticType = GameObject.Find("StilisticManager").GetComponent<StilisticManager>().Currenttype;
         ChangeVisual();
-        
+        currentCanvasGroup = GetComponent<CanvasGroup>();
     }
-    public void ChangeCellType(EffectType type)
+    public void ChangeCellType(EffectType type, ItemData data = null)
     {
         CurrentCellType = type;
+        if(data != null)
+        {
+            Image image = GetComponent<Image>();
+            image.sprite = data.icon;
+        }
+        if(CurrentCellType == EffectType.GuavaBoom)
+        {
+            if(HisPlayer == "Player1")
+            {
+                transform.name = "GuavaCell";
+            }
+            else
+            {
+                transform.name = "GuavaCell2";
+            }
+            
+        }
+
     }
     public void ChangeVisual()
     {
@@ -56,6 +78,7 @@ public class CellInShop : MonoBehaviour
                     case EffectType.Wall: image.color = normalColor; image.sprite = Resources.Load<Sprite>("sprites/CellsType/vine"); break;
                     case EffectType.MushroomMines: image.color = normalColor; image.sprite = Resources.Load<Sprite>("sprites/CellsType/mushroomMines"); break;
                     case EffectType.Capsule: image.color = normalColor; image.sprite = Resources.Load<Sprite>("sprites/CellsType/CapsuleCell"); break;
+                    case EffectType.Sacrifice: image.color = normalColor; image.sprite = Resources.Load<Sprite>("sprites/CellsType/sacrificeCell"); break;
 
                 }
                 break;
@@ -614,6 +637,12 @@ public class CellInShop : MonoBehaviour
         }
     }
 
+    public void DisableThisItem()
+    {
+        currentCanvasGroup.alpha = 0;
+        currentCanvasGroup.interactable = false;
+        currentCanvasGroup.blocksRaycasts = false;
+    }
    
 
 }

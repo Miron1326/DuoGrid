@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
     public float cellSize = 1.0f;
     private float gridCellSpacing = 2.1f;
     private DisastersManager disastersManager;
+    private MovementOnTheMouseManager movementOnTheMouseManager;
     public bool anotherPlayerStunned;
 
     // Начальные позиции
@@ -32,6 +33,7 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
+        movementOnTheMouseManager = GetComponent<MovementOnTheMouseManager>();
         disastersManager = GetComponent<DisastersManager>();
         anotherPlayerStunned = false;
         GameManager.Instance.Player1ItemsCloseCanvas();
@@ -83,7 +85,7 @@ public class PlayerController : MonoBehaviour
             Player2Step();
         }
 
-        if (Input.GetKeyDown(KeyCode.I))
+        if (Input.GetKeyDown(KeyCode.I) && movementOnTheMouseManager.allSelected)
         {
             ItemOpen = !ItemOpen;
             if (ItemOpen)
@@ -154,7 +156,7 @@ public class PlayerController : MonoBehaviour
     }
     bool MovePlayer1()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && PlayersCanSavesTacks)
+        if (Input.GetKeyDown(KeyCode.Space) && PlayersCanSavesTacks && movementOnTheMouseManager.allSelected)
         {
             Player1SavesTacts();
         }

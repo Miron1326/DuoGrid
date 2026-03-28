@@ -3,11 +3,13 @@ using UnityEngine;
 
 public class EnemyAI : MonoBehaviour
 {
+    public int EnemyLevel;
     public EnemyType currentType;
     private SpriteRenderer spriteRenderer;
     private float visionRadius = 2;
     private int stunsEnemy;
     private float damageRadius = 1;
+    private float colissionRadius = 1;
     private float moveDistance = 0.525f;
     public int health = 3;
     private string PlayerTarget;
@@ -15,13 +17,15 @@ public class EnemyAI : MonoBehaviour
     public void StartInitialize() // начальные действия
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+
         switch (currentType)
         {
             case EnemyType.Cactus:
-
+                EnemyLevel = 2;
                 spriteRenderer.sprite = Resources.Load<Sprite>("sprites/Enemys/CactusEnemyBase");
                 GameManager.Instance.OnSwitchTurn += EnemyMakeMove;
                 GameManager.Instance.OnSwitchTurn += CheckTargetInRadiusAttack;
+                GameManager.Instance.OnSwitchTurn += CheckCollision;
                 break;
         }
 
@@ -60,6 +64,27 @@ public class EnemyAI : MonoBehaviour
 
     }
 
+    private void CheckCollision()
+    {
+        switch (currentType)
+        {
+            case EnemyType.Cactus:
+                Collider2D[] nearbyCells = Physics2D.OverlapCircleAll(transform.position, colissionRadius);
+                foreach (Collider2D col in nearbyCells)
+                {
+                    AbilityItem abilityItem = col.GetComponent<AbilityItem>();
+                    if(abilityItem != null)
+                    {
+                        if(abilityItem.abilityType == AbilityType.Aprodox)
+                        {
+                            Destroy(abilityItem.gameObject);
+                        }
+
+                    }
+                }
+                    break;
+        }
+    }
     private void EnemyCheckCellUnder()//начало появления урона, логика его получения
     {
         switch (currentType)
@@ -124,7 +149,15 @@ public class EnemyAI : MonoBehaviour
         if (currentTween != null && currentTween.IsActive())
         {
             currentTween.Kill();
-            GameManager.Instance.OnSwitchTurn -= EnemyMakeMove;
+            switch (currentType)
+            {
+                case EnemyType.Cactus:
+                    GameManager.Instance.OnSwitchTurn -= EnemyMakeMove;
+                    GameManager.Instance.OnSwitchTurn -= CheckTargetInRadiusAttack;
+                    GameManager.Instance.OnSwitchTurn -= CheckCollision;
+                    break;
+            }
+
         }
     }
 

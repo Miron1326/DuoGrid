@@ -16,10 +16,16 @@ public class RealizeMechanicsCellItems : MonoBehaviour
     {
         currentCellType = GetComponent<CellType>();
         currentType = currentCellType.currentType;
-        GuavaBoomButton = GameObject.Find("GuavaCell").GetComponent<Button>();
-        GuavaBoomButton.interactable = false;
-        GuavaBoomButton2 = GameObject.Find("GuavaCell2").GetComponent<Button>();
-        GuavaBoomButton2.interactable = false;
+        GuavaBoomButton = GameObject.Find("GuavaCell")?.GetComponent<Button>();
+        if (GuavaBoomButton != null)
+        {
+            GuavaBoomButton.interactable = false;
+        }
+        GuavaBoomButton2 = GameObject.Find("GuavaCell2")?.GetComponent<Button>();
+        if (GuavaBoomButton2 != null)
+        {
+            GuavaBoomButton2.interactable = false;
+        }
     }
 
     public void RealizeMechanic(CellType cellType)
@@ -67,8 +73,14 @@ public class RealizeMechanicsCellItems : MonoBehaviour
                 }
                 currentCellType.ChangeType(EffectType.None);
                 Destroy(this);
-                GuavaBoomButton.interactable = true;
-                GuavaBoomButton2.interactable = true;
+                if (GuavaBoomButton != null)
+                {
+                    GuavaBoomButton.interactable = true;
+                }
+                if (GuavaBoomButton2 != null)
+                {
+                    GuavaBoomButton2.interactable = true;
+                }
                 break;
 
 

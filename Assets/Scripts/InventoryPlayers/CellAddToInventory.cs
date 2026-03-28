@@ -37,6 +37,9 @@ public class CellAddToInventory : MonoBehaviour
             case EffectType.MushroomMines:
                 description = "Клетка волшебных грибов, наносящие два урона наступившему и дающие стан этому игроку.";
                 break;
+            case EffectType.Sacrifice:
+                description = "Клетка жертвоприношения. Наносит урон наступившему, усиливает кактусообразных";
+                break;
         }
     }
 
