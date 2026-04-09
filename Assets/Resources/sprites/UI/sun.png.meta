@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: b6f0bf3d313b17e4baad26004e219ab9
+guid: efb785962b707bb45b6c2ee3048d0819
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7882437679272885626
-    second: bloodPortalCell_0
+      213: 605162050437240712
+    second: sun_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -51,7 +51,7 @@ TextureImporter:
   spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 120
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: bloodPortalCell_0
+      name: sun_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 128
-        height: 128
+        x: 5
+        y: 5
+        width: 118
+        height: 117
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a7df63d6e4b046d60800000000000000
-      internalID: 7882437679272885626
+      spriteID: 887dbd7bda7f56800800000000000000
+      internalID: 605162050437240712
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      bloodPortalCell_0: 7882437679272885626
+      sun_0: 605162050437240712
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

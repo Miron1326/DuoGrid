@@ -15,6 +15,13 @@ public class CellEnemyType : MonoBehaviour
     public int AttackVar;
     public List<GameObject> GameObjectAroundThisCell = new List<GameObject>();
     public List<EffectType> CellTypeCanActive = new List<EffectType>();
+    private CellType currentCellType;
+
+    private void Start()
+    {
+        currentCellType = GetComponent<CellType>();
+    }
+
     public void StartInitialize(EffectType effectFromCell)
     {
         switch (effectFromCell)
@@ -120,7 +127,7 @@ public class CellEnemyType : MonoBehaviour
         this.level += level;
         GameObject newEnemy = Instantiate(GameObject.Find("EnemyPrephab"), transform.position, Quaternion.identity);
         EnemyAI enemyAI = newEnemy.AddComponent<EnemyAI>();
-        enemyAI.currentType = EnemyType.Cactus;
+        enemyAI.CurrentType = EnemyType.Cactus;
         enemyAI.StartInitialize();
         if (Activator == "Player1")
         {

@@ -14,7 +14,7 @@ public class GridGenerator : MonoBehaviour
     [Header("Промежуток между двумя полями")]
     public float spaceBetweenFields = 5f;
 
-    void Start()
+    void Awake()
     {
         GenerateGrid();
     }

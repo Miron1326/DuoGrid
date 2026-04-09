@@ -112,11 +112,11 @@ public class CellInShop : MonoBehaviour
         
 
             Cursor.visible = false;
-        if (GameManager.Instance.player1IsOpenItems)
+        if (GameManager.Instance.Player1OpenItems)
         {
             GameManager.Instance.Player1ItemsCloseCanvas();
         }
-        if (GameManager.Instance.player2IsOpenItems)
+        if (GameManager.Instance.Player2OpenItems)
         {
             GameManager.Instance.Player2ItemsCloseCanvas();
         }
@@ -259,11 +259,11 @@ public class CellInShop : MonoBehaviour
                     CancelEditing();
                 }
             }
-            if (GameManager.Instance.player1IsOpenItems)
+            if (GameManager.Instance.Player1OpenItems)
             {
                 GameManager.Instance.Player1ItemsCloseCanvas();
             }
-            if (GameManager.Instance.player2IsOpenItems)
+            if (GameManager.Instance.Player2OpenItems)
             {
                 GameManager.Instance.Player2ItemsCloseCanvas();
             }

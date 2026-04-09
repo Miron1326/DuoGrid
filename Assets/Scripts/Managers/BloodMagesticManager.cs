@@ -1,11 +1,14 @@
 using DG.Tweening;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 public class BloodMagesticManager : MonoBehaviour
 {
+    public event Action OnBloodMageVisit;
+
     public EffectListener effectListenerPlayer1;
     public EffectListener effectListenerPlayer2;
     private EffectManager effectManager;
@@ -41,12 +44,14 @@ public class BloodMagesticManager : MonoBehaviour
 
     private void OnPlayerTakeDamage()
     {
-        int RandomNumberForInvoke = Random.Range(0, 101);
-        int RandomNumberEffect = Random.Range(0, 3);
+        int RandomNumberForInvoke = UnityEngine.Random.Range(0, 101);
+        int RandomNumberEffect = UnityEngine.Random.Range(0, 3);
         if (RandomNumberForInvoke <= ChanceforMage) // Activate
         {
             if (EffectSelected) return;
             EffectSelected = true;
+            Debug.Log("FAR2");
+            OnBloodMageVisit.Invoke();
             switch (RandomNumberEffect)
             {
                 case 0:

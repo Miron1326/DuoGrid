@@ -11,6 +11,12 @@ using Slider = UnityEngine.UI.Slider;
 
 public class GameManager : MonoBehaviour
 {
+
+    [Header("ВСЕ Клетки")]
+    [SerializeField] private Transform parentCells;
+    [SerializeField] private List<CellType> playerCells = new List<CellType>();
+    public Dictionary<EffectType, int> EffectToCountAliwe = new Dictionary<EffectType, int>();
+
     [Header("Инвентари игроков")]
     public int MaxNumbersOfItem = 2;
     private int maxItems = 2;
@@ -18,6 +24,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private PlayerInventory _player2Inventory;
     [Header("Все предметы")]
     public List<ItemData> allItems;
+    public List<Sprite> spriteOfItemsToCell = new List<Sprite>();
 
     public event Action OnSwitchTurn;
     public event Action OnTakeDamage;
@@ -100,10 +107,30 @@ public class GameManager : MonoBehaviour
         get; private set; 
     }
 
-    public bool player1IsOpenItems;
+    public bool Player1OpenItems
+    {
+        get
+        {
+            return player1OpenCanvas;
+        }
 
-    public bool player2IsOpenItems;
-    
+        private set
+        {
+            player1OpenCanvas = value;
+        }
+    }
+    public bool Player2OpenItems
+    {
+        get
+        {
+            return player2OpenCanvas;
+        }
+
+        private set
+        {
+            player1OpenCanvas = value;
+        }
+    }
     public int Poison
     {
         get
@@ -113,6 +140,32 @@ public class GameManager : MonoBehaviour
         private set
         {
             player1PoisonHave = value;
+        }
+    }
+
+    public PlayerInventory PlayerInventory1
+    {
+        get
+        {
+            return _player1Inventory;
+        }
+
+        private set
+        {
+            _player1Inventory = value;
+        }
+    }
+
+    public PlayerInventory PlayerInventory2
+    {
+        get
+        {
+            return _player2Inventory;
+        }
+
+        private set
+        {
+            _player2Inventory = value;
         }
     }
 
@@ -140,6 +193,25 @@ public class GameManager : MonoBehaviour
         UIManager = GetComponent<UIManager>();
         _player1Inventory = new PlayerInventory();
         _player2Inventory = new PlayerInventory();
+
+        
+    }
+
+    private void Start()
+    {
+        //при новом предмете - клетке
+        EffectToCountAliwe.Add(EffectType.BloodCapsule, 2);
+
+
+        CellType[] cells = parentCells.GetComponentsInChildren<CellType>(true);
+        playerCells.AddRange(cells);
+        foreach (CellType cell in playerCells)
+        {
+            if(cell.currentType == EffectType.Wall)
+            {
+                playerCells.Remove(cell);
+            }
+        }
     }
     private void Update()
     {
@@ -283,7 +355,6 @@ public class GameManager : MonoBehaviour
     }
     public void Player1ItemsOpenCanvas()
     {
-        player1IsOpenItems = true;
         player1OpenCanvas = true;
         //добавить про текст
         UIManager.UpdateUIItems("1", _player1Inventory, _player2Inventory);
@@ -298,7 +369,6 @@ public class GameManager : MonoBehaviour
     }
     public void Player1ItemsCloseCanvas()
     {
-        player1IsOpenItems = false;
         player1OpenCanvas = false;
         GameObject ItemCanvasGameObject = GameObject.Find("ImageItemsPlayer1");
         CanvasGroup CanvasGroup = ItemCanvasGameObject.GetComponent<CanvasGroup>();
@@ -312,7 +382,6 @@ public class GameManager : MonoBehaviour
 
     public void Player2ItemsOpenCanvas()
     {
-        player2IsOpenItems = true;
         player2OpenCanvas = true;
         //добавить про текст
         UIManager.UpdateUIItems("2", _player1Inventory, _player2Inventory);
@@ -327,7 +396,6 @@ public class GameManager : MonoBehaviour
     }
     public void Player2ItemsCloseCanvas()
     {
-        player2IsOpenItems = false;
         player2OpenCanvas = false;
         GameObject ItemCanvasGameObject = GameObject.Find("ImageItemsPlayer2");
         CanvasGroup CanvasGroup = ItemCanvasGameObject.GetComponent<CanvasGroup>();
@@ -406,6 +474,26 @@ public class GameManager : MonoBehaviour
         if(player2Health == 0)
         {
             CanvasGroup canvasGroup1 = GameObject.Find("Player1OfWin").GetComponent<CanvasGroup>();
+            canvasGroup1.alpha = 1f;
+            canvasGroup1.interactable = true;
+            canvasGroup1.blocksRaycasts = true;
+            StartCoroutine(WinCounterSave());
+        }
+    }
+
+    private void CheckPlayerWin()
+    {
+        if(player1Wins >= (int)PlayerPrefs.GetInt(SettingsManager.Instance.keyWins, 50))
+        {
+            CanvasGroup canvasGroup1 = GameObject.Find("Player1OfWin").GetComponent<CanvasGroup>();
+            canvasGroup1.alpha = 1f;
+            canvasGroup1.interactable = true;
+            canvasGroup1.blocksRaycasts = true;
+            StartCoroutine(WinCounterSave());
+        }
+        if (player2Wins >= (int)PlayerPrefs.GetInt(SettingsManager.Instance.keyWins, 50))
+        {
+            CanvasGroup canvasGroup1 = GameObject.Find("Player2OfWin").GetComponent<CanvasGroup>();
             canvasGroup1.alpha = 1f;
             canvasGroup1.interactable = true;
             canvasGroup1.blocksRaycasts = true;
@@ -544,6 +632,7 @@ public class GameManager : MonoBehaviour
         Player2.transform.position = _startPositionPlayer2;
         playerController.SnapToGrid("Player1");
         playerController.SnapToGrid("Player2");
+        CheckPlayerWin();
     }
 
     public void ChangeAfterEditing()
@@ -1117,11 +1206,71 @@ public class GameManager : MonoBehaviour
             return _player2Inventory;
         }
     }
+    public CellType GetRandomCellNotWall()
+    { 
+        CellType cell = null;
+        int RandomIndexCell = UnityEngine.Random.Range(0, 80);
+        cell = playerCells[RandomIndexCell];
+        Debug.LogError(cell);
+        return cell;
+    }
+    public List<CellType> GetRandomCellNotWall(int count)
+    {
+        List<CellType> randomCells = new List<CellType>();
+        for(int i = 0; i < count; i++)
+        {
+            int RandomIndexCell = UnityEngine.Random.Range(0, 80);
+
+            if (randomCells.Contains(playerCells[RandomIndexCell]) || bannedTypesToReplace.Contains(playerCells[RandomIndexCell].currentType))
+            {
+               i--; continue;
+            }
+            randomCells.Add(playerCells[RandomIndexCell]);
+
+        }
+        return randomCells;
+    }
+
+    public List<CellType> GetAllCellsWithType(EffectType type)
+    {
+        List<CellType> idealCells = new List<CellType>();
+        foreach (CellType cell in playerCells)
+        {
+            if (cell.currentType == type)
+            {
+                idealCells.Add(cell);
+            }
+        }
+        return idealCells;
+    }
+
+    public void StealItemsFromPlayer(string playerName, ItemData itemToSteal, int CountToSteal)
+    {
+       
+        if (playerName == "Player1")
+        {
+            if (itemToSteal.itemName == "Poison")
+            {
+                player1PoisonHave -= CountToSteal;
+                return;
+            }
+            ItemStatsPlayer1[itemToSteal.itemName] -= CountToSteal;
+        }
+        else
+        {
+            if (itemToSteal.itemName == "Poison")
+            {
+                player2PoisonHave -= CountToSteal;
+                return;
+            }
+            ItemStatsPlayer2[itemToSteal.itemName] -= CountToSteal;
+        }
+
+    }
 }
 
 [System.Serializable]
 public class PlayerInventory
 {
-    public Dictionary<ItemData, int> items = new Dictionary<ItemData, int>();
     public List<ItemData> data = new List<ItemData>();
 }

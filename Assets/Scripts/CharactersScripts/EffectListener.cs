@@ -29,12 +29,10 @@ public class EffectListener : MonoBehaviour
 
         if(PlayerName == "Player1")
         {
-            Debug.LogError(1);
             UIPlayersCurse.ShowCursePlayer1();
         }
         if(PlayerName == "Player2")
         {
-            Debug.LogError(2);
             UIPlayersCurse.ShowCursePlayer2();
         }
 

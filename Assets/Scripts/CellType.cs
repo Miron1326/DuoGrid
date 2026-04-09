@@ -27,11 +27,15 @@ public class CellType : MonoBehaviour
     private Color AntidoteColor = Color.springGreen;
     private Color TentacleColor = Color.aliceBlue;
     private Animator animatorForThisCell;
+    private GameObject ToCellAddPrephab;
+    private Sprite bloodCapsuleSprite;
 //speed
     private SpriteRenderer SpriteRenderer;
 
     private void Start()
     {
+        bloodCapsuleSprite = GameManager.Instance.spriteOfItemsToCell[0];
+        ToCellAddPrephab = GameObject.Find("ToCellAddPrephab");
         CurrentStilisticType  = GameObject.Find("StilisticManager").GetComponent<StilisticManager>().Currenttype;
         SpriteRenderer = GetComponent<SpriteRenderer>();
         modificatorHave = Modificator.Standart;
@@ -75,7 +79,7 @@ public class CellType : MonoBehaviour
                         cellEnemyType.DestroyEnemy();
                         GameObject newEnemy = Instantiate(GameObject.Find("EnemyPrephab"), transform.position, Quaternion.identity);
                         EnemyAI enemyAI = newEnemy.AddComponent<EnemyAI>();
-                        enemyAI.currentType = EnemyType.Cactus;
+                        enemyAI.CurrentType = EnemyType.Cactus;
                         enemyAI.StartInitialize();
                         if (playerAddModifire == "Player1")
                         {
@@ -139,7 +143,7 @@ public class CellType : MonoBehaviour
                     case EffectType.Antidote: SpriteRenderer.color = AntidoteColor; break;
                     case EffectType.Wall: SpriteRenderer.color = normalColor; SpriteRenderer.sprite = Resources.Load<Sprite>("sprites/CellsType/vine"); currentType = EffectType.Wall; break;
                     case EffectType.MushroomMines: SpriteRenderer.color = normalColor; SpriteRenderer.sprite = Resources.Load<Sprite>("sprites/CellsType/mushroomMines"); break;
-                    case EffectType.NoneWithNoneEffectedMushrooms: SpriteRenderer.color = normalColor; SpriteRenderer.sprite = Resources.Load<Sprite>("sprites/CellsType/NoneCellWithMushroom"); animatorForThisCell = SpriteRenderer.gameObject.AddComponent<Animator>(); break;
+                    case EffectType.NoneWithNoneEffectedMushrooms: SpriteRenderer.color = normalColor; SpriteRenderer.sprite = Resources.Load<Sprite>("sprites/CellsType/NoneCellWithMushroom"); if(animatorForThisCell == null) animatorForThisCell = SpriteRenderer.gameObject.AddComponent<Animator>(); break;
                     case EffectType.Tentacle:
 
                         if (modificatorHave == Modificator.Standart)
@@ -177,7 +181,14 @@ public class CellType : MonoBehaviour
                         break;
 
                     case EffectType.Sacrifice: SpriteRenderer.color = normalColor; SpriteRenderer.sprite = Resources.Load<Sprite>("sprites/CellsType/sacrificeCell"); break;
-                    case EffectType.BloodMoonPortal: SpriteRenderer.color = normalColor; SpriteRenderer.sprite = Resources.Load<Sprite>("sprites/CellsType/bloodPortalCell"); break;
+
+                    case EffectType.BloodCapsule: 
+                        SpriteRenderer.color = normalColor; SpriteRenderer.sprite = Resources.Load<Sprite>("sprites/CellsType/bloodCell");
+                        break;
+
+                    case EffectType.BloodCell: SpriteRenderer.color = normalColor; SpriteRenderer.sprite = Resources.Load<Sprite>("sprites/CellsType/bloodCell"); break;
+
+                    case EffectType.BloodPortal: SpriteRenderer.color = normalColor; SpriteRenderer.sprite = Resources.Load<Sprite>("sprites/CellsType/bloodPortalCell"); break;
                 }
                 break;
 
@@ -409,6 +420,13 @@ public class CellType : MonoBehaviour
 
     public void ChangeType(EffectType newtype)
     {
+        if(newtype == EffectType.BloodCapsule)
+        {
+            GameObject newObject = Instantiate(ToCellAddPrephab);
+            newObject.transform.position = transform.position;
+            GameObjectOnCellToEnemy cellToEnemy = newObject.AddComponent<GameObjectOnCellToEnemy>();
+            cellToEnemy.Change(bloodCapsuleSprite, newtype);
+        }
         if (GameManager.Instance.cactusLikeCell.Contains(newtype))
         {
             currentClass = CellClass.cactusLike;
@@ -502,8 +520,9 @@ public enum EffectType
     Capsule,
     Medkit,
     Sacrifice,
-    BloodMoonPortal,
-    BloodCell
+    BloodCapsule,
+    BloodCell,
+    BloodPortal
 }
 public enum Modificator
 {

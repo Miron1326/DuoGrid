@@ -52,22 +52,31 @@ public class UIManager : MonoBehaviour
             gameObjectNew = GameObject.Find("ItemSlot2" + indexNew);
         }
 
-        for (int index = 0; index < playerInventoryPlayer1.data.Count || index < GameManager.Instance.MaxNumbersOfItem; index++)
+        if(playerInventoryPlayer1.data.Count != 0)
         {
-            GameObject slotItemPlayer1 = GameObject.Find("ItemSlot1" + index);
-            UIItemSlot itemSlot = slotItemPlayer1.GetComponent<UIItemSlot>();
-            itemSlot.itemInThisSlot = playerInventoryPlayer1.data[index];
-            itemSlot.UpdateVisual();
+            for (int index = 0; index < playerInventoryPlayer1.data.Count || index < GameManager.Instance.MaxNumbersOfItem; index++)
+            {
+                GameObject slotItemPlayer1 = GameObject.Find("ItemSlot1" + index);
+                UIItemSlot itemSlot = slotItemPlayer1.GetComponent<UIItemSlot>();
+                itemSlot.itemInThisSlot = playerInventoryPlayer1.data[index];
+                itemSlot.UpdateVisual();
+            }
         }
         
-        for (int index = 0; index < playerInventoryPlayer2.data.Count || index < GameManager.Instance.MaxNumbersOfItem; index++)
+
+        if (playerInventoryPlayer2.data.Count != 0)
         {
-            GameObject slotItemPlayer2 = GameObject.Find("ItemSlot2" + index);
-            UIItemSlot itemSlot = slotItemPlayer2.GetComponent<UIItemSlot>();
-            itemSlot.itemInThisSlot = playerInventoryPlayer2.data[index];
-            itemSlot.UpdateVisual();
+            for (int index = 0; index < playerInventoryPlayer2.data.Count || index < GameManager.Instance.MaxNumbersOfItem; index++)
+            {
+                GameObject slotItemPlayer2 = GameObject.Find("ItemSlot2" + index);
+                UIItemSlot itemSlot = slotItemPlayer2.GetComponent<UIItemSlot>();
+                itemSlot.itemInThisSlot = playerInventoryPlayer2.data[index];
+                itemSlot.UpdateVisual();
+            }
         }
+
     }
+
 
     #endregion ИнвентариСоздание
 
@@ -80,10 +89,25 @@ public class UIManager : MonoBehaviour
     {
         if(PlayerItems == "1")
         {
-            string FirstItemName = player1Inventory.data[0].itemName;
-            
             Text HaveFirstText = GameObject.Find("PlayerItem10Text").GetComponent<Text>();
+            HaveFirstText.text = "";
+            Text HaveTwoText = GameObject.Find("PlayerItem11Text").GetComponent<Text>();
+            HaveTwoText.text = "";
+            string FirstItemName = "";
+            if (player1Inventory.data.Count == 0)
+            {
+                GameManager.Instance.Player1ItemsCloseCanvas();
+                return;
+            }
+            else
+            {
+                FirstItemName = player1Inventory.data[0].itemName;
+            }
+
             
+            
+
+
             if (FirstItemName == "Poison")
             {
                 HaveFirstText.text = $"{GameManager.Instance.player1PoisonHave} {player1Inventory.data[0].displayName}";
@@ -95,7 +119,7 @@ public class UIManager : MonoBehaviour
 
             if (player1Inventory.data.Count > 1)
             {
-                Text HaveTwoText = GameObject.Find("PlayerItem11Text").GetComponent<Text>();
+                
                 string TwoItemName = player1Inventory.data[1].itemName;
                 if (TwoItemName == "Poison")
                 {
@@ -111,8 +135,21 @@ public class UIManager : MonoBehaviour
         }
         else
         {
-            string FirstItemName = player2Inventory.data[0].itemName;
             Text HaveFirstText = GameObject.Find("PlayerItem20Text").GetComponent<Text>();
+            HaveFirstText.text = "";
+            Text HaveTwoText = GameObject.Find("PlayerItem21Text").GetComponent<Text>();
+            HaveTwoText.text = "";
+
+            string FirstItemName = "";
+            if (player2Inventory.data.Count == 0)
+            {
+                GameManager.Instance.Player2ItemsCloseCanvas();
+                return;
+            }
+            else
+            {
+                FirstItemName = player2Inventory.data[0].itemName;
+            }
             
             if (FirstItemName == "Poison")
             {
@@ -126,7 +163,6 @@ public class UIManager : MonoBehaviour
             if (player2Inventory.data.Count > 1)
             {
                 string TwoItemName = player2Inventory.data[1].itemName;
-                Text HaveTwoText = GameObject.Find("PlayerItem21Text").GetComponent<Text>();
                 if (TwoItemName == "Poison")
                 {
                     HaveTwoText.text = $"{GameManager.Instance.player2PoisonHave} {player2Inventory.data[1].displayName}";
