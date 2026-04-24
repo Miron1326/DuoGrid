@@ -39,6 +39,10 @@ public class EnemyAI : MonoBehaviour
                 {
                     CheckCollision();
                 }
+                else
+                {
+                    EnemyCheckCellUnder();
+                }
 
                 break;
         }
@@ -65,6 +69,7 @@ public class EnemyAI : MonoBehaviour
                 stageOfEnemy = EnemyStage.Standart;
                 EnemyLevel = 2;
                 spriteRenderer.sprite = Resources.Load<Sprite>("sprites/Enemys/CactusEnemyBase");
+                BasicItemsToEnemy();
                 GameManager.Instance.OnSwitchTurn += EnemyMakeMove;
                 GameManager.Instance.OnSwitchTurn += CheckTargetInRadiusAttack;
                 GameManager.Instance.OnSwitchTurn += CheckCollision;
@@ -259,7 +264,6 @@ public class EnemyAI : MonoBehaviour
                 foreach(Transform child in transform)
                 {
                     allChildrens.Add(child);
-
                 }
                 for (int i = 0; i < allChildrens.Count; i++)
                 {
@@ -276,6 +280,20 @@ public class EnemyAI : MonoBehaviour
 
                 }
                 break;
+        }
+    }
+
+    private void BasicItemsToEnemy()
+    {
+        List<Transform> allChildrens = new List<Transform>();
+        foreach (Transform child in transform)
+        {
+            allChildrens.Add(child);
+        }
+        for (int i = 0; i < allChildrens.Count; i++)
+        {
+            SpriteRenderer spriteRenderer = allChildrens[i].GetComponent<SpriteRenderer>();
+            spriteRenderer.enabled = false;
         }
     }
 

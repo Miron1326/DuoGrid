@@ -96,11 +96,19 @@ public class BloodMagesticManager : MonoBehaviour
         effectManager.StopBloodRain();
         FirstMageDiactivate();
     }
+
+    public void AddEffectToPlayer(string playerName, PlayerEffect playerEffect)
+    {
+        if(playerName == "Player1")
+        {
+            effectListenerPlayer1.AddEffect(playerEffect);
+        }
+        else
+        {
+            effectListenerPlayer2.AddEffect(playerEffect);
+        }
+    }
 }
 
-public enum PlayerEffect
-{
-    None,
-    poisonedBlood
-}
+
 

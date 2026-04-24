@@ -29,11 +29,12 @@ public class CellType : MonoBehaviour
     private Animator animatorForThisCell;
     private GameObject ToCellAddPrephab;
     private Sprite bloodCapsuleSprite;
-//speed
+    private BloodMagesticManager _bloodMagesticManager;
     private SpriteRenderer SpriteRenderer;
 
     private void Start()
     {
+        _bloodMagesticManager = GameObject.Find("BloodManager").GetComponent<BloodMagesticManager>();
         bloodCapsuleSprite = GameManager.Instance.spriteOfItemsToCell[0];
         ToCellAddPrephab = GameObject.Find("ToCellAddPrephab");
         CurrentStilisticType  = GameObject.Find("StilisticManager").GetComponent<StilisticManager>().Currenttype;
@@ -189,6 +190,7 @@ public class CellType : MonoBehaviour
                     case EffectType.BloodCell: SpriteRenderer.color = normalColor; SpriteRenderer.sprite = Resources.Load<Sprite>("sprites/CellsType/bloodCell"); break;
 
                     case EffectType.BloodPortal: SpriteRenderer.color = normalColor; SpriteRenderer.sprite = Resources.Load<Sprite>("sprites/CellsType/bloodPortalCell"); break;
+                    case EffectType.FieldCell: SpriteRenderer.color = normalColor; SpriteRenderer.sprite = Resources.Load<Sprite>("sprites/CellsType/ShieldCell"); break;
                 }
                 break;
 
@@ -392,6 +394,44 @@ public class CellType : MonoBehaviour
                 ChangeType(EffectType.None);
                 BloodMagesticManager bloodMagesticManager = GameObject.Find("BloodManager").GetComponent<BloodMagesticManager>();
                 bloodMagesticManager.ChanceforMage += 100;
+
+                EffectListener effectListenerTarget = null;
+                GameObject PlayerATarget;
+                string nameTarget;
+                bool attract = false;
+                if(player.name == "Player1")
+                {
+                    nameTarget = "Player2";
+                    PlayerATarget = GameObject.Find(nameTarget);
+                    effectListenerTarget = GameManager.Instance.effectListener(nameTarget);
+                    if (effectListenerTarget.currentEffect == PlayerEffect.shieldField)
+                    {
+                        attract = true;
+                    }
+                }
+                else
+                {
+                    nameTarget = "Player1";
+                    PlayerATarget = GameObject.Find(nameTarget);
+                    effectListenerTarget = GameManager.Instance.effectListener(nameTarget);
+                    if (effectListenerTarget.currentEffect == PlayerEffect.shieldField)
+                    {
+                        attract = true;
+                    }
+                }
+
+                if (attract)
+                {
+                    effectListenerTarget.DeleteEffect();
+                    PlayerATarget.transform.position = transform.position - new Vector3(2, 0, 0);
+                    GameManager.Instance.playerController.SnapToGrid(nameTarget);
+                    GameManager.Instance.playerController.ChangeSchem();
+                }
+
+                break;
+            case EffectType.FieldCell:
+                if (!ActiveCell) return;
+                _bloodMagesticManager.AddEffectToPlayer(player.name, PlayerEffect.shieldField);
                 break;
         }
     }
@@ -420,6 +460,11 @@ public class CellType : MonoBehaviour
 
     public void ChangeType(EffectType newtype)
     {
+        if(newtype != EffectType.NoneWithNoneEffectedMushrooms)
+        {
+            GameManager.Instance.CellSpawned();
+        }
+
         if(newtype == EffectType.BloodCapsule)
         {
             GameObject newObject = Instantiate(ToCellAddPrephab);
@@ -522,7 +567,8 @@ public enum EffectType
     Sacrifice,
     BloodCapsule,
     BloodCell,
-    BloodPortal
+    BloodPortal,
+    FieldCell
 }
 public enum Modificator
 {

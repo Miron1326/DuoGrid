@@ -79,6 +79,11 @@ public class CellEnemyType : MonoBehaviour
                         {
                             if (CellTypeCanActive.Contains(obj.GetComponent<CellType>().currentType))
                             {
+                                if(obj.GetComponent<CellType>().currentType != EffectType.NoneWithNoneEffectedMushrooms)
+                                {
+                                    AudioManager.Instance.OnCactusAttack();
+                                }
+
                                 CellType selectedCell = obj.GetComponent<CellType>();
                                 if (obj.GetComponent<CellType>().currentType == EffectType.MushroomMines)
                                 {
@@ -96,12 +101,15 @@ public class CellEnemyType : MonoBehaviour
 
                         if(collider.name == "Player1")
                         {
+                            AudioManager.Instance.OnCactusAttack();
                             GameManager.Instance.TakeDamage("Player1", AttackVar);
                         }
                         if (collider.name == "Player2")
                         {
+                            AudioManager.Instance.OnCactusAttack();
                             GameManager.Instance.TakeDamage("Player2", AttackVar);
                         }
+
                         if (!GameObjectAroundThisCell.Contains(obj))
                             GameObjectAroundThisCell.Add(obj);
                     }

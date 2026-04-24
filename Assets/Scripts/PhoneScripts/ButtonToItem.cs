@@ -7,6 +7,7 @@ public class ButtonToItem : MonoBehaviour
         MovementOnTheMouseManager movementOnTheMouseManager = GameObject.Find("GameManager").GetComponent<MovementOnTheMouseManager>();
         if(movementOnTheMouseManager.Player1Move)
         {
+            Debug.LogError(GameManager.Instance.Player1OpenItems);
             if (!GameManager.Instance.Player1OpenItems)
             {
                 GameManager.Instance.Player1ItemsOpenCanvas();
@@ -19,6 +20,7 @@ public class ButtonToItem : MonoBehaviour
         }
         else
         {
+            Debug.LogError(GameManager.Instance.Player2OpenItems);
             if (!GameManager.Instance.Player2OpenItems)
             {
                 GameManager.Instance.Player2ItemsOpenCanvas();

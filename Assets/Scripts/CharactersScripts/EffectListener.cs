@@ -5,6 +5,10 @@ using UnityEngine.UI;
 
 public class EffectListener : MonoBehaviour
 {
+    public bool canTakeDamage;
+    public bool canTakeExplosionDamage;
+
+    public SpriteRenderer courseOrBuffOnPlayerVisual;
     public UIPlayersCurse UIPlayersCurse;
     public string PlayerName;
     public PlayerEffect currentEffect;
@@ -16,6 +20,7 @@ public class EffectListener : MonoBehaviour
 
     private void Start()
     {
+        VisualizeBuffs();
         UIPlayersCurse = GameObject.Find("BloodManager").GetComponent<UIPlayersCurse>();
         buttonAbilityPlayer1 = GameObject.Find("PlayerAbilityUse1").GetComponent<CanvasGroup>();
         buttonAbilityPlayer2 = GameObject.Find("PlayerAbilityUse2").GetComponent<CanvasGroup>();
@@ -26,7 +31,10 @@ public class EffectListener : MonoBehaviour
 
     public void AddEffect(PlayerEffect effectAdd)
     {
-
+        if(currentEffect == PlayerEffect.shieldField)
+        {
+            return;
+        }
         if(PlayerName == "Player1")
         {
             UIPlayersCurse.ShowCursePlayer1();
@@ -36,9 +44,14 @@ public class EffectListener : MonoBehaviour
             UIPlayersCurse.ShowCursePlayer2();
         }
 
+        if(currentEffect == PlayerEffect.None)
+        {
+            GameManager.Instance.OnSwitchTurn += EffectsCheck;
+        }
+
         currentEffect = effectAdd;
         InitializeEffect();
-        GameManager.Instance.OnSwitchTurn += EffectsCheck;
+
         if(PlayerName == "Player1")
         {
             GameManager.Instance.OnTakeDamagePlayer1 += CheckToDestroyEffectAfterDamagePlayer1;
@@ -48,6 +61,26 @@ public class EffectListener : MonoBehaviour
             GameManager.Instance.OnTakeDamagePlayer2 += CheckToDestroyEffectAfterDamagePlayer2;
         }
 
+        VisualizeBuffs();
+    }
+
+    private void VisualizeBuffs()
+    {
+        switch (currentEffect)
+        {
+            case PlayerEffect.shieldField:
+                courseOrBuffOnPlayerVisual.enabled = true;
+                canTakeDamage = false;
+                canTakeExplosionDamage = true;
+                courseOrBuffOnPlayerVisual.sprite = Resources.Load<Sprite>("sprites/EffectsOnPlayer/shieldField");
+                break;
+
+            default:
+                courseOrBuffOnPlayerVisual.enabled = false;
+                canTakeDamage = true;
+                canTakeExplosionDamage = true;
+                break;
+        }
     }
 
     private void InitializeEffect()
@@ -57,6 +90,10 @@ public class EffectListener : MonoBehaviour
             case PlayerEffect.poisonedBlood:
                 TurnsToActive = 3;
                 TurnsToNonActive = 5;
+                break;
+            case PlayerEffect.shieldField:
+                TurnsToActive = 1;
+                TurnsToNonActive = 9;
                 break;
         }
     }
@@ -90,6 +127,7 @@ public class EffectListener : MonoBehaviour
                     CanSeeButtonPlayer2();
                     DeleteEffect();
                 }
+                VisualizeBuffs();
             }
             else
             {
@@ -125,7 +163,10 @@ public class EffectListener : MonoBehaviour
 
     public void DeleteEffect()
     {
+        GameManager.Instance.OnSwitchTurn -= EffectsCheck;
+
         currentEffect = PlayerEffect.None;
+        VisualizeBuffs();
 
         if (PlayerName == "Player1")
         {
@@ -187,4 +228,10 @@ public class EffectListener : MonoBehaviour
             }
         }
     }
+}
+public enum PlayerEffect
+{
+    None,
+    poisonedBlood,
+    shieldField
 }

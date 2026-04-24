@@ -79,6 +79,7 @@ public class CellInShop : MonoBehaviour
                     case EffectType.MushroomMines: image.color = normalColor; image.sprite = Resources.Load<Sprite>("sprites/CellsType/mushroomMines"); break;
                     case EffectType.Capsule: image.color = normalColor; image.sprite = Resources.Load<Sprite>("sprites/CellsType/CapsuleCell"); break;
                     case EffectType.Sacrifice: image.color = normalColor; image.sprite = Resources.Load<Sprite>("sprites/CellsType/sacrificeCell"); break;
+                    case EffectType.FieldCell: image.color = normalColor; image.sprite = Resources.Load<Sprite>("sprites/CellsType/ShieldCell"); break;
 
                 }
                 break;

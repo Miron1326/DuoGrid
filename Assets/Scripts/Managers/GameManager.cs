@@ -11,6 +11,7 @@ using Slider = UnityEngine.UI.Slider;
 
 public class GameManager : MonoBehaviour
 {
+    public List<PlayerEffect> buffs = new List<PlayerEffect>();
 
     [Header("ВСЕ Клетки")]
     [SerializeField] private Transform parentCells;
@@ -29,6 +30,7 @@ public class GameManager : MonoBehaviour
     public event Action OnSwitchTurn;
     public event Action OnTakeDamage;
     public event Action OnTakeDamagePlayer1;
+    public event Action OnCellSpawned;
     public event Action OnTakeDamagePlayer2;
     [Header("Классы клеток")]
     public List<EffectType> cactusLikeCell = new List<EffectType>();
@@ -70,6 +72,7 @@ public class GameManager : MonoBehaviour
     public bool Player2Select;
     public bool Player1CanPlaceFinish;
     public bool Player2CanPlaceFinish;
+    public PlayerController playerController;
     public List<EffectType> bannedTypesToReplace = new List<EffectType>();
     public List<EffectType> allowedTypesInYourSt = new List<EffectType>();
     public List<EffectType> allowedTypesInOtherSt = new List<EffectType>();
@@ -101,6 +104,8 @@ public class GameManager : MonoBehaviour
     private CellInventory cellInventoryPl2;
     private BloodMagesticManager bloodMagesticManager;
     private UIManager UIManager;
+    private EffectListener effectListenerPlayer1;
+    private EffectListener effectListenerPlayer2;
 
     public static GameManager Instance
     {
@@ -199,9 +204,11 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        playerController = GetComponent<PlayerController>();
         //при новом предмете - клетке
         EffectToCountAliwe.Add(EffectType.BloodCapsule, 2);
-
+        effectListenerPlayer1 = bloodMagesticManager.effectListenerPlayer1;
+        effectListenerPlayer2 = bloodMagesticManager.effectListenerPlayer2;
 
         CellType[] cells = parentCells.GetComponentsInChildren<CellType>(true);
         playerCells.AddRange(cells);
@@ -213,6 +220,19 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+
+    public EffectListener effectListener(string player)
+    {
+        if(player == "Player1")
+        {
+            return effectListenerPlayer1;
+        }
+        else
+        {
+            return effectListenerPlayer2;
+        }
+    }
+
     private void Update()
     {
         if (TurnPlayer1 == TurnPlayer2)
@@ -423,32 +443,45 @@ public class GameManager : MonoBehaviour
         OnTakeDamage?.Invoke();
         if (playerName == "Explosure Player1")
         {
-            player1Health -= damage;
-            OnTakeDamagePlayer1?.Invoke();
+            if (effectListenerPlayer1.canTakeExplosionDamage)
+            {
+                player1Health -= damage;
+                OnTakeDamagePlayer1?.Invoke();
+            }
         }
         if (playerName == "Explosure Player2")
         {
-            player2Health -= damage;
-            OnTakeDamagePlayer2?.Invoke();
+            if (effectListenerPlayer2.canTakeExplosionDamage)
+            {
+                player2Health -= damage;
+                OnTakeDamagePlayer2?.Invoke();
+            }
         }
         if (playerName == "Player1")
         {
-            player1Health -= damage;
-            OnTakeDamagePlayer1?.Invoke();
-            if (effectManager != null)
+            if (effectListenerPlayer1.canTakeDamage)
             {
-                effectManager.Player1Damaged(GameObject.Find(playerName).transform.position);
+                player1Health -= damage;
+                OnTakeDamagePlayer1?.Invoke();
+                if (effectManager != null)
+                {
+                    effectManager.Player1Damaged(GameObject.Find(playerName).transform.position);
+                }
+                else
+                {
+                    Debug.Log("sdasdasdasdasdasdsad");
+                }
             }
-            else
-            {
-                Debug.Log("sdasdasdasdasdasdsad");
-            }
+
         }
         if (playerName == "Player2")
         {
-            player2Health -= damage;
-            OnTakeDamagePlayer2?.Invoke();
-            effectManager.Player2Damaged(GameObject.Find(playerName).transform.position);
+            if (effectListenerPlayer2.canTakeDamage)
+            {
+                player2Health -= damage;
+                OnTakeDamagePlayer2?.Invoke();
+                effectManager.Player2Damaged(GameObject.Find(playerName).transform.position);
+            }
         }
         if (player1Health < 0)
         {
@@ -481,6 +514,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    
     private void CheckPlayerWin()
     {
         if(player1Wins >= (int)PlayerPrefs.GetInt(SettingsManager.Instance.keyWins, 50))
@@ -680,7 +714,7 @@ public class GameManager : MonoBehaviour
             }
             if (PlayerTurn == "Player2")
             {
-                Player2Text.text = "Игрок 2 ХОДИТ \nЗдоровье " + player2Health + "\n побед " + player2Wins + " \nТактов " + player2Tacts;
+                Player2Text.text = "ХОДИТ Игрок 2 \nЗдоровье " + player2Health + "\n побед " + player2Wins + " \nТактов " + player2Tacts;
             }
             if (player1IsPoisoned)
             {
@@ -688,7 +722,7 @@ public class GameManager : MonoBehaviour
             }
             if (player2IsPoisoned)
             {
-                Player2Text.text = "Игрок 2 ХОДИТ \nЗдоровье " + player2Health + " ОТРАВЛЕН, УМРЕТ ЧЕРЕЗ " + p2poisondamageafter + " Ходов" + "\n побед " + player2Wins + " \nТактов " + player1Tacts;
+                Player2Text.text = "ХОДИТ Игрок 2 \nЗдоровье " + player2Health + " ОТРАВЛЕН, УМРЕТ ЧЕРЕЗ " + p2poisondamageafter + " Ходов" + "\n побед " + player2Wins + " \nТактов " + player1Tacts;
             }
         }
     }
@@ -1266,6 +1300,11 @@ public class GameManager : MonoBehaviour
             ItemStatsPlayer2[itemToSteal.itemName] -= CountToSteal;
         }
 
+    }
+
+    public void CellSpawned()
+    {
+        OnCellSpawned.Invoke();
     }
 }
 
