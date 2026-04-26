@@ -36,6 +36,7 @@ public class GameManager : MonoBehaviour
     public List<EffectType> cactusLikeCell = new List<EffectType>();
 
     [Header("Состояния игроков")]
+    public TimeOfDay currentTimeDay;
     private bool CellsPlayer1;
     private bool CellsPlayer2;
     public List<EffectType> NewCellsWithMoreFunctional = new List<EffectType>();  
@@ -1312,4 +1313,10 @@ public class GameManager : MonoBehaviour
 public class PlayerInventory
 {
     public List<ItemData> data = new List<ItemData>();
+}
+public enum TimeOfDay
+{
+    Day,
+    Night,
+    BloodNight
 }

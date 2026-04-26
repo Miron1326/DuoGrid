@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 
 
@@ -16,6 +17,8 @@ public class CellType : MonoBehaviour
     public string playerAddModifire;
     private int TimerForItemsCell;
     private const int DamageForExpl = 2;
+    private bool EffectAfterCan = false;
+    private int ActivateEffectAfter = 2;
     public EffectType currentType;
     public Modificator modificatorHave;
     public bool CanPlaceInYourSt;
@@ -31,6 +34,7 @@ public class CellType : MonoBehaviour
     private Sprite bloodCapsuleSprite;
     private BloodMagesticManager _bloodMagesticManager;
     private SpriteRenderer SpriteRenderer;
+    private int basicIntEffectAfter;
 
     private void Start()
     {
@@ -191,6 +195,7 @@ public class CellType : MonoBehaviour
 
                     case EffectType.BloodPortal: SpriteRenderer.color = normalColor; SpriteRenderer.sprite = Resources.Load<Sprite>("sprites/CellsType/bloodPortalCell"); break;
                     case EffectType.FieldCell: SpriteRenderer.color = normalColor; SpriteRenderer.sprite = Resources.Load<Sprite>("sprites/CellsType/ShieldCell"); break;
+                    case EffectType.InfectionCell: SpriteRenderer.color = Color.red; SpriteRenderer.sprite = Resources.Load<Sprite>("sprites/CellsType/ShieldCell"); break;
                 }
                 break;
 
@@ -280,6 +285,7 @@ public class CellType : MonoBehaviour
 
         switch (currentType)
         {
+            case EffectType.InfectionCell:
             case EffectType.FireCell:
             case EffectType.Damage:
                 if (!ActiveCell) return;
@@ -460,6 +466,20 @@ public class CellType : MonoBehaviour
 
     public void ChangeType(EffectType newtype)
     {
+        Initialize(newtype);
+        if(newtype == EffectType.InfectionCell)
+        {
+            GameManager.Instance.OnSwitchTurn += ActionAfterTurns;
+            EffectAfterCan = true;
+        }
+        else
+        {
+            if (EffectAfterCan)
+            {
+                GameManager.Instance.OnSwitchTurn -= ActionAfterTurns;
+                EffectAfterCan = false;
+            }
+        }
         if(newtype != EffectType.NoneWithNoneEffectedMushrooms)
         {
             GameManager.Instance.CellSpawned();
@@ -535,6 +555,17 @@ public class CellType : MonoBehaviour
         Debug.Log("клетка изменена на " + newtype);
     }
 
+    private void Initialize(EffectType newType)
+    {
+        switch (newType)
+        {
+            case EffectType.InfectionCell:
+                basicIntEffectAfter = 6;
+                break;
+        }
+        ActivateEffectAfter = basicIntEffectAfter;
+    }
+
     public void Restart()
     {
         UpdateVisual();
@@ -546,6 +577,38 @@ public class CellType : MonoBehaviour
         if (currentType == EffectType.FireCell && TurnsHave == 7)
         {
             ChangeType(EffectType.None);
+        }
+    }
+
+    public void ActionAfterTurns()
+    {
+        ActivateEffectAfter--;
+        if(ActivateEffectAfter == 0)
+        {
+            switch (currentType)
+            {
+                case EffectType.InfectionCell:
+                    Collider2D[] coliders = Physics2D.OverlapBoxAll(transform.position, new Vector2(4, 5), 0);
+                    foreach (Collider2D colider in coliders)
+                    {
+                        CellType cellType = colider.GetComponent<CellType>();
+                        if (cellType != null && cellType.currentType == EffectType.InfectionCell)
+                        {
+                            break;
+                        }
+                        if(cellType != null)
+                        {
+                            if (!GameManager.Instance.bannedTypesToReplace.Contains(cellType.currentType))
+                            {
+                                cellType.ChangeType(EffectType.InfectionCell);
+                                break;
+                            }
+                        }
+                        
+                    }
+                    break;
+            }
+            ActivateEffectAfter = basicIntEffectAfter;
         }
     }
 }
@@ -568,7 +631,8 @@ public enum EffectType
     BloodCapsule,
     BloodCell,
     BloodPortal,
-    FieldCell
+    FieldCell,
+    InfectionCell
 }
 public enum Modificator
 {

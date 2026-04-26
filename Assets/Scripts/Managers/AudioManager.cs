@@ -9,6 +9,7 @@ public class AudioManager : MonoBehaviour
     }
 
     [SerializeField] AudioSource _cellSpawned;
+    [SerializeField] AudioSource _cellSelected;
     [SerializeField] AudioSource _cactusAttack;
     void Start()
     {
@@ -28,5 +29,9 @@ public class AudioManager : MonoBehaviour
     public void OnCactusAttack()
     {
         _cactusAttack.Play();
+    }
+    public void OnCellSelected()
+    {
+        _cellSelected.Play();
     }
 }

@@ -45,6 +45,7 @@ public class CellAddToInventory : MonoBehaviour
 
     public void AddCellIntoInventory()
     {
+        
         if (PlayerAdd == "Player1")
         {
             PanelYourInventory = GameObject.Find("InventoryPlayer1");
@@ -64,6 +65,7 @@ public class CellAddToInventory : MonoBehaviour
             if (!inventory.playerHave.Contains(currentCellType))
             {
                 if (inventory.playerHave.Count >= 5) return;                  //максимум
+                AudioManager.Instance.OnCellSelected();
                 inventory.playerHave.Add(currentCellType);
                 inventory.playerHaveSprite.Add(currentSprite);
                 inventory.ChangeInventory();

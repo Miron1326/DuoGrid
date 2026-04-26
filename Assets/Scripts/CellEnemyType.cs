@@ -47,6 +47,7 @@ public class CellEnemyType : MonoBehaviour
                 CellTypeCanActive.Add(EffectType.MushroomMines);
                 CellTypeCanActive.Add(EffectType.NoneWithNoneEffectedMushrooms);
                 CellTypeCanActive.Add(EffectType.GuavaBoom);
+                CellTypeCanActive.Add(EffectType.InfectionCell);
                 CheckAttackCan();
                 GameManager.Instance.OnSwitchTurn += CheckAttackCan;
                 break;
@@ -79,7 +80,13 @@ public class CellEnemyType : MonoBehaviour
                         {
                             if (CellTypeCanActive.Contains(obj.GetComponent<CellType>().currentType))
                             {
-                                if(obj.GetComponent<CellType>().currentType != EffectType.NoneWithNoneEffectedMushrooms)
+                                if (obj.GetComponent<CellType>().currentType == EffectType.InfectionCell)
+                                {
+                                    DestroyEnemy(EffectType.InfectionCell);
+                                    return;
+                                }
+
+                                if (obj.GetComponent<CellType>().currentType != EffectType.NoneWithNoneEffectedMushrooms)
                                 {
                                     AudioManager.Instance.OnCactusAttack();
                                 }
@@ -91,6 +98,7 @@ public class CellEnemyType : MonoBehaviour
                                     thisCell.ChangeType(EffectType.None);
                                     DestroyEnemy();
                                 }
+                                
                                 selectedCell.ChangeType(EffectType.None);
                                 BoxCollider2D boxCollider2DSelected = selectedCell.gameObject.GetComponent<BoxCollider2D>();
                                 boxCollider2DSelected.isTrigger = true;
@@ -118,10 +126,10 @@ public class CellEnemyType : MonoBehaviour
         }
     }
 
-    public void DestroyEnemy()
+    public void DestroyEnemy(EffectType newEffectType = EffectType.None)
     {
         CellType thisCell = GetComponent<CellType>();
-        thisCell.ChangeType(EffectType.None);
+        thisCell.ChangeType(newEffectType);
         Destroy(GetComponent<CellEnemyType>());
         GameManager.Instance.OnSwitchTurn -= CheckAttackCan;
     }
