@@ -35,10 +35,7 @@ public class CellType : MonoBehaviour
     private BloodMagesticManager _bloodMagesticManager;
     private SpriteRenderer SpriteRenderer;
     private int basicIntEffectAfter;
-<<<<<<< HEAD
     private CellEnemyType _cellEnemyType;
-=======
->>>>>>> db38b45ec418d9a84c03753d8c7b39ec48e8c611
 
     private void Start()
     {
@@ -200,10 +197,7 @@ public class CellType : MonoBehaviour
                     case EffectType.BloodPortal: SpriteRenderer.color = normalColor; SpriteRenderer.sprite = Resources.Load<Sprite>("sprites/CellsType/bloodPortalCell"); break;
                     case EffectType.FieldCell: SpriteRenderer.color = normalColor; SpriteRenderer.sprite = Resources.Load<Sprite>("sprites/CellsType/ShieldCell"); break;
                     case EffectType.InfectionCell: SpriteRenderer.color = Color.red; SpriteRenderer.sprite = Resources.Load<Sprite>("sprites/CellsType/ShieldCell"); break;
-<<<<<<< HEAD
                     case EffectType.Turret: SpriteRenderer.color = Color.green; SpriteRenderer.sprite = Resources.Load<Sprite>("sprites/CellsType/ShieldCell"); break;
-=======
->>>>>>> db38b45ec418d9a84c03753d8c7b39ec48e8c611
                 }
                 break;
 
@@ -474,13 +468,10 @@ public class CellType : MonoBehaviour
 
     public void ChangeType(EffectType newtype)
     {
-<<<<<<< HEAD
         if(_cellEnemyType != null && newtype == EffectType.None)
         {
             Destroy(_cellEnemyType);
         }
-=======
->>>>>>> db38b45ec418d9a84c03753d8c7b39ec48e8c611
         Initialize(newtype);
         if(newtype == EffectType.InfectionCell)
         {
@@ -647,12 +638,8 @@ public enum EffectType
     BloodCell,
     BloodPortal,
     FieldCell,
-<<<<<<< HEAD
     InfectionCell,
     Turret
-=======
-    InfectionCell
->>>>>>> db38b45ec418d9a84c03753d8c7b39ec48e8c611
 }
 public enum Modificator
 {

@@ -36,7 +36,6 @@ public class AudioManager : MonoBehaviour
     {
         _cellSelected.Play();
     }
-<<<<<<< HEAD
 
     public void OnTurretAttack()
     {
@@ -47,6 +46,4 @@ public class AudioManager : MonoBehaviour
     {
         _bloodSuckerAttack.Play();
     }
-=======
->>>>>>> db38b45ec418d9a84c03753d8c7b39ec48e8c611
 }

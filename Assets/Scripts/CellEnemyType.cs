@@ -118,15 +118,7 @@ public class CellEnemyType : MonoBehaviour
                         {
                             if (CellTypeCanActive.Contains(obj.GetComponent<CellType>().currentType))
                             {
-<<<<<<< HEAD
                                 
-=======
-                                if (obj.GetComponent<CellType>().currentType == EffectType.InfectionCell)
-                                {
-                                    DestroyEnemy(EffectType.InfectionCell);
-                                    return;
-                                }
->>>>>>> db38b45ec418d9a84c03753d8c7b39ec48e8c611
 
                                 if (obj.GetComponent<CellType>().currentType != EffectType.NoneWithNoneEffectedMushrooms)
                                 {
@@ -211,12 +203,7 @@ public class CellEnemyType : MonoBehaviour
     {
         CellType thisCell = GetComponent<CellType>();
         thisCell.ChangeType(newEffectType);
-<<<<<<< HEAD
         Destroy(this);
-=======
-        Destroy(GetComponent<CellEnemyType>());
-        GameManager.Instance.OnSwitchTurn -= CheckAttackCan;
->>>>>>> db38b45ec418d9a84c03753d8c7b39ec48e8c611
     }
     public void OnDrawGizmos()
     {
