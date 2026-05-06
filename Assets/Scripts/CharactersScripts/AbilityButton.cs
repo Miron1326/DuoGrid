@@ -3,6 +3,8 @@ using DG.Tweening;
 
 public class AbilityButton : MonoBehaviour
 {
+    public bool Changed = false;
+    public int MoggedZone;
     public string PlayerName;
     public CanvasGroup thisCanvasGroup;
     private CharacterData CharacterData;
@@ -96,6 +98,11 @@ public class AbilityButton : MonoBehaviour
                 {
                     GameManager.Instance.OnSwitchTurn += WaitCooldown;
                     NonAs50Visible();
+                }
+
+                if (Changed)
+                {
+                    abilityItem.Change(new Vector2(MoggedZone, MoggedZone));
                 }
             }
             //при нажатии изменить клетку и не заканчивать ход. точнее только функции.

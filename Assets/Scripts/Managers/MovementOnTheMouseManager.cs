@@ -16,8 +16,8 @@ public class MovementOnTheMouseManager : MonoBehaviour
     private GameObject player2;
     public GameObject PrephabToMove;
     public float speed = 5;
-    private Vector3 originalPositionPlayer1;
-    private Vector3 originalPositionPlayer2;
+    [SerializeField] private Vector3 originalPositionPlayer1;
+    [SerializeField] private Vector3 originalPositionPlayer2;
     public bool CanPutHere;
     public bool allSelected = false;
     public HashSet<GameObject> detectedObjects = new HashSet<GameObject>(); //список без повторяемых данных

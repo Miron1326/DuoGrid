@@ -9,7 +9,10 @@ public class AudioManager : MonoBehaviour
     }
 
     [SerializeField] AudioSource _cellSpawned;
+    [SerializeField] AudioSource _cellSelected;
     [SerializeField] AudioSource _cactusAttack;
+    [SerializeField] AudioSource _turretAttack;
+    [SerializeField] AudioSource _bloodSuckerAttack;
     void Start()
     {
         GameManager.Instance.OnCellSpawned += OnCellSpawned;
@@ -28,5 +31,19 @@ public class AudioManager : MonoBehaviour
     public void OnCactusAttack()
     {
         _cactusAttack.Play();
+    }
+    public void OnCellSelected()
+    {
+        _cellSelected.Play();
+    }
+
+    public void OnTurretAttack()
+    {
+        _turretAttack.Play();
+    }
+
+    public void OnBloodSuckerAttack()
+    {
+        _bloodSuckerAttack.Play();
     }
 }

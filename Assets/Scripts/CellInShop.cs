@@ -10,7 +10,7 @@ using UnityEngine.UI;
 
 public class CellInShop : MonoBehaviour
 {
-    
+    public int levelOfNewEnemyType;
     public StilisticType CurrentStilisticType;
     public string Name;
     public EffectType CurrentCellType;

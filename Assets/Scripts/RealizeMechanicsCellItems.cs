@@ -58,6 +58,13 @@ public class RealizeMechanicsCellItems : MonoBehaviour
                         {
                             if (GameManager.Instance.TypeCellCanToBoom.Contains(typeSelectedCell.currentType))
                             {
+                                if(TryGetComponent<CellEnemyType>(out CellEnemyType cellEnemyType))
+                                {
+                                    if (!cellEnemyType.canBoom)
+                                    {
+                                        continue;
+                                    }
+                                }
                                 typeSelectedCell.ChangeType(EffectType.FireCell);
                                 if(typeSelectedCell.TryGetComponent<Rigidbody2D>(out Rigidbody2D rigidbody))
                                 {

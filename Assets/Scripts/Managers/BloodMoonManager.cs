@@ -63,7 +63,8 @@ public class BloodMoonManager : MonoBehaviour
         }
         if (Day)
         {
-            if(sunColor != Color.white)
+            GameManager.Instance.currentTimeDay = TimeOfDay.Day;
+            if (sunColor != Color.white)
             for(float i = 0; i < 1;i += 0.1f)
             {
                LightGlobal.color = Color.Lerp(Color.gray, Color.white, i);
@@ -72,6 +73,7 @@ public class BloodMoonManager : MonoBehaviour
         }
         else
         {
+            GameManager.Instance.currentTimeDay = TimeOfDay.Night;
             if (sunColor != Color.gray6)
                 for (float i = 0; i < 1; i += 0.1f)
                 {
@@ -86,6 +88,7 @@ public class BloodMoonManager : MonoBehaviour
     {
         if (!Day)
         {
+            GameManager.Instance.currentTimeDay = TimeOfDay.BloodNight;
             cellsToChange = GameManager.Instance.GetRandomCellNotWall(BLOOD_CELL_FROM_BLOOD_MOON);
             foreach (CellType cellType in cellsToChange)
             {

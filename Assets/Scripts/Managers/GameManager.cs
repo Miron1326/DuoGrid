@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
@@ -28,6 +30,8 @@ public class GameManager : MonoBehaviour
     public List<Sprite> spriteOfItemsToCell = new List<Sprite>();
 
     public event Action OnSwitchTurn;
+    public event Action OnPlayer1Win;
+    public event Action OnPlayer2Win;
     public event Action OnTakeDamage;
     public event Action OnTakeDamagePlayer1;
     public event Action OnCellSpawned;
@@ -36,8 +40,10 @@ public class GameManager : MonoBehaviour
     public List<EffectType> cactusLikeCell = new List<EffectType>();
 
     [Header("Состояния игроков")]
+    public TimeOfDay currentTimeDay;
     private bool CellsPlayer1;
     private bool CellsPlayer2;
+    public List<EffectType> UpdatesCellsType;
     public List<EffectType> NewCellsWithMoreFunctional = new List<EffectType>();  
     public List<EffectType> inventoryCellTypePlayer1 = new List<EffectType>();
     public List<EffectType> inventoryCellTypePlayer2 = new List<EffectType>();
@@ -97,6 +103,8 @@ public class GameManager : MonoBehaviour
     private bool player2OpenCanvas = false;
     private float TimeToBoom;
     private float TimeRemained;
+    [SerializeField] private int LevelPlayer1;
+    [SerializeField] private int LevelPlayer2;
     private Text textForTimer;
     private Canvas canvasTimer;
     private GameObject thisGameObjectTimer;
@@ -106,6 +114,45 @@ public class GameManager : MonoBehaviour
     private UIManager UIManager;
     private EffectListener effectListenerPlayer1;
     private EffectListener effectListenerPlayer2;
+    private LevelTreeManager levelTreeManager;
+    private MovementOnTheMouseManager _movementOnTheMouseManager;
+
+    private float lastSwitchTime = 0;
+    private float switchCooldown = 0.01f;
+
+    public void ExchangeHPForWins(string PlayerName, int hpTo, int winsTo)
+    {
+        if(PlayerName == "1")
+        {
+            player1Health -= hpTo;
+            player1Wins += winsTo;
+        }
+        if (PlayerName == "2")
+        {
+            player2Health -= hpTo;
+            player2Wins += winsTo;
+        }
+        PlayerUIEn("");
+        CheckPlayerDeath();
+        if(player1Health > 0 || player2Health > 0)
+        {
+            CheckPlayerWin();
+        }
+
+    }
+
+    public void UpdateAllCellEnemyTypeToLevel(int newLevel, string PlayerNameUpdate)
+    {
+        CellEnemyType[] cellEnemyTypes = FindObjectsByType<CellEnemyType>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach(CellEnemyType cellEnemyType in cellEnemyTypes)
+        {
+            if(cellEnemyType.dontAttackPlayer == PlayerNameUpdate)
+            {
+                cellEnemyType.ChangeLevel(newLevel, "");
+            }
+
+        }
+    }
 
     public static GameManager Instance
     {
@@ -204,6 +251,8 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        _movementOnTheMouseManager = GetComponent<MovementOnTheMouseManager>();
+        levelTreeManager = GetComponent<LevelTreeManager>();
         playerController = GetComponent<PlayerController>();
         //при новом предмете - клетке
         EffectToCountAliwe.Add(EffectType.BloodCapsule, 2);
@@ -219,6 +268,35 @@ public class GameManager : MonoBehaviour
                 playerCells.Remove(cell);
             }
         }
+        OnSwitchTurn += UpdateAllCellEnemyTypePlayer1;
+        OnSwitchTurn += UpdateAllCellEnemyTypePlayer2;
+    }
+
+    private void UpdateAllCellEnemyTypePlayer1()
+    {
+        CellEnemyType[] cellEnemyTypes = FindObjectsByType<CellEnemyType>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (CellEnemyType cellEnemyType in cellEnemyTypes)
+        {
+            if (cellEnemyType.dontAttackPlayer == "Player1")
+            {
+                cellEnemyType.ChangeLevel(levelTreeManager.levelOfCellInNewSlotPlayer1, "Player1");
+            }
+
+        }
+
+    }
+    private void UpdateAllCellEnemyTypePlayer2()
+    {
+        CellEnemyType[] cellEnemyTypes = FindObjectsByType<CellEnemyType>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (CellEnemyType cellEnemyType in cellEnemyTypes)
+        {
+            if (cellEnemyType.dontAttackPlayer == "Player2")
+            {
+                cellEnemyType.ChangeLevel(levelTreeManager.levelOfCellInNewSlotPlayer2, "Player2");
+            }
+
+        }
+
     }
 
     public EffectListener effectListener(string player)
@@ -263,6 +341,11 @@ public class GameManager : MonoBehaviour
 
     public void SwitchTurn()
     {
+        if(Time.time - lastSwitchTime < switchCooldown)
+        {
+            return;
+        }
+        lastSwitchTime = Time.time;
         OnSwitchTurn?.Invoke();
     }
 
@@ -430,57 +513,74 @@ public class GameManager : MonoBehaviour
     {
         if(playerName == "Player1")
         {
-            player1Health++;
+            player1Health += healTo;
         }
         if (playerName == "Player2")
         {
-            player2Health++;
+            player2Health += healTo;
         }
         PlayerUIEn("");
     }
     public void TakeDamage(string playerName, int damage)
     {
         OnTakeDamage?.Invoke();
+
+        int RandomInt = UnityEngine.Random.Range(0, 101);
+
         if (playerName == "Explosure Player1")
         {
-            if (effectListenerPlayer1.canTakeExplosionDamage)
+            if(levelTreeManager.LevelSkipEffectPlayer1 < RandomInt)
             {
-                player1Health -= damage;
-                OnTakeDamagePlayer1?.Invoke();
+                if (effectListenerPlayer1.canTakeExplosionDamage)
+                {
+
+                    player1Health -= damage;
+                    OnTakeDamagePlayer1?.Invoke();
+                }
             }
+
         }
         if (playerName == "Explosure Player2")
         {
-            if (effectListenerPlayer2.canTakeExplosionDamage)
+            if (levelTreeManager.LevelSkipEffectPlayer2 < RandomInt)
             {
-                player2Health -= damage;
-                OnTakeDamagePlayer2?.Invoke();
+                if (effectListenerPlayer2.canTakeExplosionDamage)
+                {
+                    player2Health -= damage;
+                    OnTakeDamagePlayer2?.Invoke();
+                }
             }
         }
         if (playerName == "Player1")
         {
-            if (effectListenerPlayer1.canTakeDamage)
+            if (levelTreeManager.LevelSkipEffectPlayer1 < RandomInt)
             {
-                player1Health -= damage;
-                OnTakeDamagePlayer1?.Invoke();
-                if (effectManager != null)
+                if (effectListenerPlayer1.canTakeDamage)
                 {
-                    effectManager.Player1Damaged(GameObject.Find(playerName).transform.position);
-                }
-                else
-                {
-                    Debug.Log("sdasdasdasdasdasdsad");
+                    player1Health -= damage;
+                    OnTakeDamagePlayer1?.Invoke();
+                    if (effectManager != null)
+                    {
+                        effectManager.Player1Damaged(GameObject.Find(playerName).transform.position);
+                    }
+                    else
+                    {
+                        Debug.Log("sdasdasdasdasdasdsad");
+                    }
                 }
             }
 
         }
         if (playerName == "Player2")
         {
-            if (effectListenerPlayer2.canTakeDamage)
+            if (levelTreeManager.LevelSkipEffectPlayer2 < RandomInt)
             {
-                player2Health -= damage;
-                OnTakeDamagePlayer2?.Invoke();
-                effectManager.Player2Damaged(GameObject.Find(playerName).transform.position);
+                if (effectListenerPlayer2.canTakeDamage)
+                {
+                    player2Health -= damage;
+                    OnTakeDamagePlayer2?.Invoke();
+                    effectManager.Player2Damaged(GameObject.Find(playerName).transform.position);
+                }
             }
         }
         if (player1Health < 0)
@@ -496,7 +596,7 @@ public class GameManager : MonoBehaviour
     }
     private void CheckPlayerDeath()
     {
-        if (player1Health == 0)
+        if (player1Health <= 0)
         {
             CanvasGroup canvasGroup1 = GameObject.Find("Player2OfWin").GetComponent<CanvasGroup>();
             canvasGroup1.alpha = 1f;
@@ -504,7 +604,7 @@ public class GameManager : MonoBehaviour
             canvasGroup1.blocksRaycasts = true;
             StartCoroutine(WinCounterSave());
         }
-        if(player2Health == 0)
+        if(player2Health <= 0)
         {
             CanvasGroup canvasGroup1 = GameObject.Find("Player1OfWin").GetComponent<CanvasGroup>();
             canvasGroup1.alpha = 1f;
@@ -648,14 +748,20 @@ public class GameManager : MonoBehaviour
     }
     public void PlayerToWin(string PlayerName)
     {
+
         if (PlayerName == "Player1")
         {
+            OnPlayer1Win.Invoke();
             player1Wins += 1;
+            LevelPlayer1++;
         }
         if(PlayerName == "Player2")
         {
+            OnPlayer2Win.Invoke();
             player2Wins += 1;
+            LevelPlayer2++;
         }
+
         PlayerUIEn("");
         PlayerController playerController = GetComponent<PlayerController>();
         GameObject Player1 = GameObject.Find("Player1");
@@ -666,6 +772,7 @@ public class GameManager : MonoBehaviour
         Player2.transform.position = _startPositionPlayer2;
         playerController.SnapToGrid("Player1");
         playerController.SnapToGrid("Player2");
+        
         CheckPlayerWin();
     }
 
@@ -756,6 +863,7 @@ public class GameManager : MonoBehaviour
 
     public void RestartGame()
     {
+        levelTreeManager.Restart();
         AbilityItem[] abilityItems = FindObjectsByType<AbilityItem>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         foreach (AbilityItem ability in abilityItems)
         {
@@ -1312,4 +1420,10 @@ public class GameManager : MonoBehaviour
 public class PlayerInventory
 {
     public List<ItemData> data = new List<ItemData>();
+}
+public enum TimeOfDay
+{
+    Day,
+    Night,
+    BloodNight
 }

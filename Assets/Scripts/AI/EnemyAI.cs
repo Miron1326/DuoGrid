@@ -200,6 +200,8 @@ public class EnemyAI : MonoBehaviour
                                     return;
                                 }
                             }
+
+                            AudioManager.Instance.OnBloodSuckerAttack();
                             itemsInThisEnemy.Add(itemSteal);
                             GameManager.Instance.StealItemsFromPlayer("Player1", itemSteal, itemsToStealBloodSucker);
                             AddItemsInThisEnemyTo();

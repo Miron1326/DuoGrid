@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class CharacterManager : MonoBehaviour
 {
+    private LevelTreeManager levelTreeManager;
     public GameObject player1;
     public GameObject player2;
     public AbilityButton abilityButtonPlayer1;
@@ -19,6 +20,7 @@ public class CharacterManager : MonoBehaviour
 
     private void Start()
     {
+        levelTreeManager = GetComponent<LevelTreeManager>();
         ButtonPlayer1 = GameObject.Find("PlayerAbilityUse1").GetComponent<Button>();
         ButtonPlayer2 = GameObject.Find("PlayerAbilityUse2").GetComponent<Button>();
         FadePlayerAbilities();
@@ -32,9 +34,8 @@ public class CharacterManager : MonoBehaviour
     public void PlayerSellected()
     {
         string playerName = null;
-        if(CharacterDataPlayer1 != null)
+        if (CharacterDataPlayer1 != null)
         {
-            
             playerName = "Player1";
             switch (CharacterDataPlayer1.CharacterName)
             {
@@ -56,6 +57,7 @@ public class CharacterManager : MonoBehaviour
                 Standart(playerName);
                 UpdateVisual();
             }
+            levelTreeManager.CharacterDataPlayer1 = CharacterDataPlayer1;
         }
         if (CharacterDataPlayer2 != null)
         {
@@ -75,9 +77,11 @@ public class CharacterManager : MonoBehaviour
                 canvas.blocksRaycasts = false;
                 canvas.alpha = 0;
             }
+            levelTreeManager.CharacterDataPlayer2 = CharacterDataPlayer2;
         }
         UpdateVisual();
         Standart(playerName);
+        levelTreeManager.UpdateStandartEffect();
     }
 
     //Player1

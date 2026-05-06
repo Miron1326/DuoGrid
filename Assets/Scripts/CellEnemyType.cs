@@ -1,11 +1,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using DG.Tweening;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 public class CellEnemyType : MonoBehaviour
 {
+    public bool canBoom;
     public int level;
     public Collider2D[] colliders;
     public EnemyTypeCell currentType;
@@ -13,13 +16,17 @@ public class CellEnemyType : MonoBehaviour
     public int Health;
     public bool HaveHealth;
     public int AttackVar;
+    private string DontAttackPlayer;
     public List<GameObject> GameObjectAroundThisCell = new List<GameObject>();
     public List<EffectType> CellTypeCanActive = new List<EffectType>();
-    private CellType currentCellType;
+    public CellType currentCellType;
+    private GameObject _bulletPrephab;
 
     private void Start()
     {
         currentCellType = GetComponent<CellType>();
+        _bulletPrephab = GameObject.Find("BulletPrephab");
+        canBoom = true;
     }
 
     public void StartInitialize(EffectType effectFromCell)
@@ -47,9 +54,41 @@ public class CellEnemyType : MonoBehaviour
                 CellTypeCanActive.Add(EffectType.MushroomMines);
                 CellTypeCanActive.Add(EffectType.NoneWithNoneEffectedMushrooms);
                 CellTypeCanActive.Add(EffectType.GuavaBoom);
+                CellTypeCanActive.Add(EffectType.InfectionCell);
                 CheckAttackCan();
                 GameManager.Instance.OnSwitchTurn += CheckAttackCan;
                 break;
+            case EffectType.Turret:
+
+                currentType = EnemyTypeCell.Turret;
+                HaveHealth = true;
+                AttackVar = 1;
+                VectorAttack = new Vector2(5.2f, 1);
+                if(GameManager.Instance.TurnPlayer1 == GameManager.Instance.TurnPlayer2)
+                {
+                    DontAttackPlayer = "Player1";
+                }
+                else 
+                {
+                    DontAttackPlayer = "Player2";
+                }
+
+
+                    CheckAttackCan();
+                GameManager.Instance.OnSwitchTurn += CheckAttackCan;
+                break;
+        }
+    }
+
+    public string dontAttackPlayer
+    {
+        get
+        {
+            return DontAttackPlayer;
+        }
+        private set
+        {
+            DontAttackPlayer = value;
         }
     }
 
@@ -79,9 +118,16 @@ public class CellEnemyType : MonoBehaviour
                         {
                             if (CellTypeCanActive.Contains(obj.GetComponent<CellType>().currentType))
                             {
-                                if(obj.GetComponent<CellType>().currentType != EffectType.NoneWithNoneEffectedMushrooms)
+                                
+
+                                if (obj.GetComponent<CellType>().currentType != EffectType.NoneWithNoneEffectedMushrooms)
                                 {
                                     AudioManager.Instance.OnCactusAttack();
+                                }
+                                if (obj.GetComponent<CellType>().currentType == EffectType.InfectionCell)
+                                {
+                                    DestroyEnemy(EffectType.InfectionCell);
+                                    return;
                                 }
 
                                 CellType selectedCell = obj.GetComponent<CellType>();
@@ -91,6 +137,7 @@ public class CellEnemyType : MonoBehaviour
                                     thisCell.ChangeType(EffectType.None);
                                     DestroyEnemy();
                                 }
+                                
                                 selectedCell.ChangeType(EffectType.None);
                                 BoxCollider2D boxCollider2DSelected = selectedCell.gameObject.GetComponent<BoxCollider2D>();
                                 boxCollider2DSelected.isTrigger = true;
@@ -115,41 +162,100 @@ public class CellEnemyType : MonoBehaviour
                     }
                 }
                 break;
+            case EnemyTypeCell.Turret:
+                colliders = Physics2D.OverlapBoxAll(transform.position, VectorAttack, 0);
+                List<Collider2D> colidersGet = new List<Collider2D>();
+                foreach (Collider2D collider in colliders)
+                {
+                    string AttackPlayer = "";
+                    colidersGet.Clear();
+                    if (collider.gameObject == gameObject) continue;
+                    if(collider.name == "Player1" && DontAttackPlayer != collider.name)
+                    {
+                        AttackPlayer = "Player1";
+                        colidersGet.Add(collider);
+                        GameManager.Instance.TakeDamage("Player1", AttackVar);
+                    }
+                    if (collider.name == "Player2" && DontAttackPlayer != collider.name)
+                    {
+                        colidersGet.Add(collider);
+                        AttackPlayer = "Player2";
+                        GameManager.Instance.TakeDamage("Player2", AttackVar);
+                    }
+
+                    if(colidersGet.Count != 0)
+                    {
+                        Debug.LogError(AttackPlayer);
+                        GameObject newBullet = Instantiate(_bulletPrephab, transform.position, Quaternion.identity);
+                        BulletAI newBulletAI = newBullet.AddComponent<BulletAI>();
+                        newBullet.transform.DOMove(GameObject.Find(AttackPlayer).transform.position, .5f);
+                        newBulletAI.nameCollision = AttackPlayer;
+                        AudioManager.Instance.OnTurretAttack();
+                        return;
+                    }
+
+                }
+                    break;
         }
     }
 
-    public void DestroyEnemy()
+    public void DestroyEnemy(EffectType newEffectType = EffectType.None)
     {
         CellType thisCell = GetComponent<CellType>();
-        thisCell.ChangeType(EffectType.None);
-        Destroy(GetComponent<CellEnemyType>());
-        GameManager.Instance.OnSwitchTurn -= CheckAttackCan;
+        thisCell.ChangeType(newEffectType);
+        Destroy(this);
     }
     public void OnDrawGizmos()
     {
+        if(currentType != EnemyTypeCell.None)
         Gizmos.DrawWireCube(transform.position, VectorAttack);
     }
 
+    private void OnDestroy()
+    {
+        GameManager.Instance.OnSwitchTurn -= CheckAttackCan;
+    }
     public void ChangeLevel(int level, string Activator)
     {
-        this.level += level;
-        GameObject newEnemy = Instantiate(GameObject.Find("EnemyPrephab"), transform.position, Quaternion.identity);
-        EnemyAI enemyAI = newEnemy.AddComponent<EnemyAI>();
-        enemyAI.CurrentType = EnemyType.Cactus;
-        enemyAI.StartInitialize();
-        if (Activator == "Player1")
+        switch (currentType)
         {
-            enemyAI.SetPlayerTarget("Player2");
+            case EnemyTypeCell.Tentacle:
+                this.level += level;
+                GameObject newEnemy = Instantiate(GameObject.Find("EnemyPrephab"), transform.position, Quaternion.identity);
+                EnemyAI enemyAI = newEnemy.AddComponent<EnemyAI>();
+                enemyAI.CurrentType = EnemyType.Cactus;
+                enemyAI.StartInitialize();
+                if (Activator == "Player1")
+                {
+                    enemyAI.SetPlayerTarget("Player2");
+                }
+                if (Activator == "Player2")
+                {
+                    enemyAI.SetPlayerTarget("Player1");
+                }
+                DestroyEnemy();
+                break;
+            case EnemyTypeCell.Turret:
+                this.level = level;
+                switch (this.level)
+                {
+                    case 2:
+                        VectorAttack = new Vector2(10.2f, 1);
+                        break;
+                    case 3:
+                        canBoom = false;
+                        VectorAttack = new Vector2(10.2f, 1);
+                        break;
+                }
+                break;
         }
-        if (Activator == "Player2")
-        {
-            enemyAI.SetPlayerTarget("Player1");
-        }
-        DestroyEnemy();
+        
         
     }
 }
 public enum EnemyTypeCell
 {
-    Tentacle
+    None,
+    Tentacle,
+    Turret
 }
