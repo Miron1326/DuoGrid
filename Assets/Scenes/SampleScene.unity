@@ -3690,6 +3690,7 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2500225323283309347, guid: 2adf5967ade4d3e49ace5130fe04f228, type: 3}
   m_PrefabInstance: {fileID: 273506061}
   m_PrefabAsset: {fileID: 0}
+<<<<<<< HEAD
 --- !u!1 &279206823
 GameObject:
   m_ObjectHideFlags: 0
@@ -3765,6 +3766,8 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 279206823}
   m_CullTransparentMesh: 1
+=======
+>>>>>>> db38b45ec418d9a84c03753d8c7b39ec48e8c611
 --- !u!1001 &280673361
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -46131,8 +46134,11 @@ Transform:
   - {fileID: 1823950961}
   - {fileID: 1145788222}
   - {fileID: 218099976}
+<<<<<<< HEAD
   - {fileID: 1833556501}
   - {fileID: 1444026702}
+=======
+>>>>>>> db38b45ec418d9a84c03753d8c7b39ec48e8c611
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1285001103
@@ -54250,7 +54256,10 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 25a7fe073c44d3b4eb1cca037b6bb537, type: 3}
   cactusLikeCell: 08000000
   currentTimeDay: 0
+<<<<<<< HEAD
   UpdatesCellsType: 
+=======
+>>>>>>> db38b45ec418d9a84c03753d8c7b39ec48e8c611
   NewCellsWithMoreFunctional: 0d000000
   inventoryCellTypePlayer1: 
   inventoryCellTypePlayer2: 
@@ -54289,10 +54298,17 @@ MonoBehaviour:
   Player1CanPlaceFinish: 0
   Player2CanPlaceFinish: 0
   playerController: {fileID: 0}
+<<<<<<< HEAD
   bannedTypesToReplace: 04000000020000000300000005000000060000000a000000080000000c0000000d00000010000000120000001100000013000000
   allowedTypesInYourSt: 0400000006000000010000000500000007000000020000000b0000000c0000000d000000110000001200000013000000
   allowedTypesInOtherSt: 03000000
   allowedTypesInBothSt: 0100000006000000040000000500000007000000020000000b0000000c0000000d000000110000001200000013000000
+=======
+  bannedTypesToReplace: 04000000020000000300000005000000060000000a000000080000000c0000000d000000100000001200000011000000
+  allowedTypesInYourSt: 0400000006000000010000000500000007000000020000000b0000000c0000000d0000001100000012000000
+  allowedTypesInOtherSt: 03000000
+  allowedTypesInBothSt: 0100000006000000040000000500000007000000020000000b0000000c0000000d0000001100000012000000
+>>>>>>> db38b45ec418d9a84c03753d8c7b39ec48e8c611
   TypeCantStandOn: 06000000
   TypeCellEnemy: 0800000013000000
   TypeCellToThrow: 
@@ -54368,7 +54384,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DisastersManager
   CellCreatingInThisTurn: 0
+<<<<<<< HEAD
   CellTypesCantChange: 0100000002000000030000000400000005000000060000000700000008000000090000000a0000000b000000100000000e0000000f0000000d0000000c000000110000001200000013000000
+=======
+  CellTypesCantChange: 0100000002000000030000000400000005000000060000000700000008000000090000000a0000000b000000100000000e0000000f0000000d0000000c0000001100000012000000
+>>>>>>> db38b45ec418d9a84c03753d8c7b39ec48e8c611
   disastersTipes: 
   cellTypesAct: []
   thisType: 0
